@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "nombre": "Jengibre",
+        "precio": 2800,
+        "categoria": "Especias",
+        "stock": 45,
+        "unidad": "lb",
+        "imagen": "https://placehold.co/280x220"
+    },
+    {
+        "id": 2,
+        "nombre": "Tomate Chonto",
+        "precio": 3500,
+        "categoria": "Verduras",
+        "stock": 120,
+        "unidad": "lb",
+        "imagen": "https://placehold.co/280x220"
+    }
+]

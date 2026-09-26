@@ -979,6 +979,7 @@
     font-size: 13px;
     font-family: 'Inter', sans-serif;
 }
+
 /* --- BOTÓN DE CERRAR SESIÓN (TopBar) --- */
 .btn-logout {
     background-color: transparent;

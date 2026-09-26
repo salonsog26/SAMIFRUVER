@@ -46,7 +46,7 @@ function RegistrarProducto() {
     return (
         <div className="admin-layout">
             <Sidebar />
-            <main className="admin-main-container" style={{ position: 'relative' }}>
+            <main className="admin-main-container">
                 <TopBar />
 
                 {alerta && <Alert tipo={alerta.tipo} mensaje={alerta.mensaje} />}
@@ -71,3 +71,4 @@ function RegistrarProducto() {
 }
 
 export default RegistrarProducto;
+

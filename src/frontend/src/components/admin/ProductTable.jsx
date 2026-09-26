@@ -29,6 +29,7 @@ function ProductTable({ productos = [], onEliminar }) {
             <div className="product-table-header">
                 <div className="col-foto table-header-text">Foto</div>
                 <div className="col-nombre table-header-text">Nombre</div>
+                <div className="col-categoria table-header-text">Categoría</div>
                 <div className="col-stock table-header-text">Stock</div>
                 <div className="col-precio table-header-text">Precio</div>
                 <div className="col-acciones table-header-text">Acciones</div>
