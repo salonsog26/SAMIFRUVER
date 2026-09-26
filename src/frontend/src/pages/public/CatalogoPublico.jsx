@@ -1,18 +1,36 @@
 // src/pages/public/CatalogoPublico.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import ProductCard from '../../components/public/ProductCard';
 import '../../styles/variables.css';
 
 function CatalogoPublico() {
-    // Datos de ejemplo (aún sin conectar a backend — pendiente de HU2/HU de catálogo)
-    const productosDestacados = [
-        { nombre: 'Tomate Chonto', categoria: 'Verduras', precio: '$2.500 COP', unidad: 'lb', imagen: 'https://placehold.co/280x220' },
-        { nombre: 'Tomate Chonto', categoria: 'Verduras', precio: '$2.500 COP', unidad: 'lb', imagen: 'https://placehold.co/280x220' },
-        { nombre: 'Tomate Chonto', categoria: 'Verduras', precio: '$2.500 COP', unidad: 'lb', imagen: 'https://placehold.co/280x220' },
-        { nombre: 'Tomate Chonto', categoria: 'Verduras', precio: '$2.500 COP', unidad: 'lb', imagen: 'https://placehold.co/280x220' },
-    ];
+
+    const [productosDestacados, setProductosDestacados] = useState([]);
+    const [cargando, setCargando] = useState(true);
+
+
+    useEffect(() => {
+        fetch('http://localhost:4000/api/productos')
+            .then((res) => res.json())
+            .then((data) => {
+
+                const productosMapeados = data.map(prod => ({
+                    nombre: prod.nombre,
+                    categoria: prod.categoria,
+                    precio: `$${prod.precio.toLocaleString()} COP`,
+                    unidad: prod.unidad || 'lb',
+                    imagen: prod.imagen || 'https://placehold.co/280x220'
+                }));
+                setProductosDestacados(productosMapeados);
+                setCargando(false);
+            })
+            .catch((error) => {
+                console.error('Error al conectar con el backend:', error);
+                setCargando(false);
+            });
+    }, []);
 
     return (
         <div className="public-page">
@@ -42,11 +60,15 @@ function CatalogoPublico() {
                     <a href="#todos" className="public-products-link">Ver todos los productos →</a>
                 </div>
 
-                <div className="public-products-grid">
-                    {productosDestacados.map((producto, index) => (
-                        <ProductCard key={index} {...producto} />
-                    ))}
-                </div>
+                {cargando ? (
+                    <p style={{ padding: '20px', fontFamily: 'Inter', color: '#8D6E63' }}>Cargando productos de la cosecha...</p>
+                ) : (
+                    <div className="public-products-grid">
+                        {productosDestacados.map((producto, index) => (
+                            <ProductCard key={index} {...producto} />
+                        ))}
+                    </div>
+                )}
             </section>
 
             <Footer />

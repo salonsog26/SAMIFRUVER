@@ -1,5 +1,6 @@
 // src/components/public/AuthHeroBanner.jsx
 import React from 'react';
+import logo from '../../assets/logo-samifruver.png';
 import '../../styles/variables.css';
 
 function AuthHeroBanner() {
@@ -13,11 +14,8 @@ function AuthHeroBanner() {
             <div style={{ width: '100%', height: '100%', left: 0, top: 0, position: 'absolute', background: 'linear-gradient(180deg, rgba(10, 42, 22, 0.05) 0%, rgba(10, 42, 22, 0.72) 100%)' }} />
 
             {/* Logo superior */}
-            <div style={{ zIndex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 38, height: 38, background: 'white', borderRadius: 12, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <div style={{ width: 14, height: 16, border: '1px solid #20A34A' }} />
-                </div>
-                <span style={{ color: 'white', fontSize: 20, fontFamily: 'Inter', fontWeight: 800 }}>SAMIFRUBER</span>
+            <div style={{ zIndex: 1 }}>
+                <img src={logo} alt="Samifruver" style={{ height: 34, width: 'auto' }} />
             </div>
 
             {/* Texto institucional */}

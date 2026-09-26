@@ -1,32 +1,32 @@
-// src/components/admin/Sidebar.jsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // Para navegar entre pantallas
+import { NavLink } from 'react-router-dom';
+import logo from '../../assets/logo-samifruver.png';
 import '../../styles/variables.css';
 
 function Sidebar() {
     return (
         <aside className="sidebar">
-            {/* Logo y Marca */}
             <div className="sidebar-logo-container">
-                <div className="sidebar-logo-icon">
-                    <div className="sidebar-logo-inner"></div>
-                </div>
-                <div className="sidebar-brand">SAMIFRUBER</div>
+                <img src={logo} alt="Samifruver" style={{ height: 36, width: 'auto' }} />
             </div>
 
-            {/* Navegación */}
             <nav className="sidebar-menu">
-                {/* Usamos <Link> en lugar de <a> para el enrutador de React */}
-                <Link to="/admin/dashboard" className="menu-item">
+                <NavLink
+                    to="/admin/productos"
+                    end
+                    className={({ isActive }) => `menu-item${isActive ? ' active' : ''}`}
+                >
                     <div className="menu-icon-placeholder"></div>
-                    <span className="menu-item-text">Catalogo</span>
-                </Link>
+                    <span className="menu-item-text">Catálogo</span>
+                </NavLink>
 
-                {/* El menú activo */}
-                <Link to="/admin/productos" className="menu-item active">
+                <NavLink
+                    to="/admin/productos/nuevo"
+                    className={({ isActive }) => `menu-item${isActive ? ' active' : ''}`}
+                >
                     <div className="menu-icon-placeholder"></div>
-                    <span className="menu-item-text">Productos</span>
-                </Link>
+                    <span className="menu-item-text">Agregar producto</span>
+                </NavLink>
             </nav>
         </aside>
     );

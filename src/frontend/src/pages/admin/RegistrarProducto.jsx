@@ -1,21 +1,47 @@
-// src/pages/admin/RegistrarProducto.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar';
 import TopBar from '../../components/admin/TopBar';
 import ProductForm from '../../components/forms/ProductForm';
 import Alert from '../../components/ui/Alert';
+import { useProductos, validarProducto } from '../../context/ProductosContext';
 import '../../styles/variables.css';
 
 function RegistrarProducto() {
-    // Variables de estado para simular las diferentes pantallas de Figma
-    // Cambia esto a 'exito' o 'duplicado' para probar las alertas
-    const [estadoRegistro, setEstadoRegistro] = useState('exito');
-
-    // Si quieres ver el campo rojo del nombre, descomenta esta línea:
-    // const [errores, setErrores] = useState({ nombre: 'Este campo es obligatorio' });
+    const navigate = useNavigate();
+    const { productos, agregarProducto } = useProductos();
     const [errores, setErrores] = useState({});
+    const [alerta, setAlerta] = useState(null);
+    const [guardando, setGuardando] = useState(false);
 
-    const datosPimenton = { nombre: 'Pimentón', precio: '4000', categoria: 'Verduras', stock: '30' };
+    const manejarGuardar = async (datosFormulario) => {
+        const nuevosErrores = validarProducto(datosFormulario);
+        setErrores(nuevosErrores);
+        if (Object.keys(nuevosErrores).length > 0) {
+            setAlerta({ tipo: 'error', mensaje: 'Completa todos los campos antes de guardar.' });
+            return;
+        }
+
+        const nombre = datosFormulario.nombre.trim().toLowerCase();
+        const duplicado = productos.some((producto) => producto.nombre.trim().toLowerCase() === nombre);
+        if (duplicado) {
+            setAlerta({ tipo: 'error', mensaje: 'El producto ya existe. No se permite registro duplicado' });
+            return;
+        }
+
+        setGuardando(true);
+        try {
+            await agregarProducto(datosFormulario);
+            navigate('/admin/productos', {
+                state: {
+                    alerta: { tipo: 'exito', mensaje: 'Producto registrado exitosamente' },
+                },
+            });
+        } catch (error) {
+            setAlerta({ tipo: 'error', mensaje: error.message });
+            setGuardando(false);
+        }
+    };
 
     return (
         <div className="admin-layout">
@@ -23,25 +49,20 @@ function RegistrarProducto() {
             <main className="admin-main-container" style={{ position: 'relative' }}>
                 <TopBar />
 
-                {/* Lógica de Renderizado Condicional de la Alerta */}
-                {estadoRegistro === 'exito' && (
-                    <Alert tipo="exito" mensaje="Producto registrado exitosamente" />
-                )}
-                {estadoRegistro === 'duplicado' && (
-                    <Alert tipo="error" mensaje="El producto ya existe. No se permite registro duplicado" />
-                )}
+                {alerta && <Alert tipo={alerta.tipo} mensaje={alerta.mensaje} />}
 
                 <section className="page-content">
                     <div className="page-header">
-                        <h1 className="page-title">Registrar Producto</h1>
-                        <p className="page-subtitle">Agrega un nuevo producto agrícola al inventario de distribución.</p>
+                        <h1 className="page-title">Registrar producto</h1>
+                        <p className="page-subtitle">Agrega un nuevo producto agrícola al inventario. Al guardar, aparece en el catálogo.</p>
                     </div>
 
-                    {/* Pasamos los errores al formulario */}
                     <ProductForm
                         modoEdicion={false}
-                        datosIniciales={estadoRegistro === 'exito' ? datosPimenton : {}}
+                        datosIniciales={{}}
                         errores={errores}
+                        onSubmit={manejarGuardar}
+                        onCancel={() => navigate('/admin/productos')}
                     />
                 </section>
             </main>

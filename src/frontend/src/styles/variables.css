@@ -144,6 +144,13 @@
     flex: 1;
 }
 
+.page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+}
+
 .page-header {
     display: flex;
     flex-direction: column;
@@ -185,6 +192,10 @@
     color: #3E2723;
     font-size: 15px;
     font-family: 'Inter', sans-serif;
+}
+
+.search-container-active {
+    border: 1.5px solid #2E7D32;
 }
 
 .search-icon-placeholder {
@@ -382,6 +393,11 @@
     width: 150px;
 }
 
+.product-table-header .col-acciones {
+    width: 240px;
+    text-align: right;
+}
+
 .table-header-text {
     color: #8D6E63;
     font-size: 13px;
@@ -423,6 +439,33 @@
     color: #2E7D32;
     font-size: 14px;
     font-weight: 700;
+}
+
+.col-acciones {
+    width: 240px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-table {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-table-primary {
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+}
+
+.btn-table-danger {
+    background-color: white;
+    color: #C62828;
+    border: 1px solid #C62828;
 }
 
 .product-image {
@@ -935,4 +978,16 @@
     color: rgba(255, 255, 255, 0.8);
     font-size: 13px;
     font-family: 'Inter', sans-serif;
+}
+/* --- BOTÓN DE CERRAR SESIÓN (TopBar) --- */
+.btn-logout {
+    background-color: transparent;
+    border: 1px solid #E6DEC9;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    color: #3E2723;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
 }

@@ -1,51 +1,89 @@
-// src/pages/admin/ConsultarProductos.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar';
 import TopBar from '../../components/admin/TopBar';
-import ProductTable from '../../components/admin/ProductTable'; // Importamos la tabla
+import ProductTable from '../../components/admin/ProductTable';
+import Alert from '../../components/ui/Alert';
+import Modal from '../../components/ui/Modal';
+import { useProductos } from '../../context/ProductosContext';
 import '../../styles/variables.css';
 
 function ConsultarProductos() {
-    // Simulamos la base de datos de productos encontrados
-    // (Para probar el estado vacío, cambia esto a: const resultadosBusqueda = []; )
-    const resultadosBusqueda = [
-        { nombre: 'Champiñón París', stock: 180, precio: '$4.200 ARS / kg', imagen: 'https://placehold.co/40x40' },
-        { nombre: 'Champiñón Portobello', stock: 95, precio: '$5.800 ARS / kg', imagen: 'https://placehold.co/40x40' },
-        { nombre: 'Gírgolas (Ostras)', stock: 40, precio: '$6.500 ARS / kg', imagen: 'https://placehold.co/40x40' },
-        { nombre: 'Seta Shiitake', stock: 15, precio: '$8.900 ARS / kg', imagen: 'https://placehold.co/40x40' },
-    ];
+    const { productos, cargando, errorCarga, eliminarProducto } = useProductos();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const [busqueda, setBusqueda] = useState('');
+    const [alerta, setAlerta] = useState(location.state?.alerta || null);
+    const [productoAEliminar, setProductoAEliminar] = useState(null);
+
+    useEffect(() => {
+        if (location.state?.alerta) {
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, navigate]);
+
+    const termino = busqueda.trim().toLowerCase();
+    const resultados = termino
+        ? productos.filter((producto) => producto.nombre.toLowerCase().includes(termino))
+        : productos;
+
+    const confirmarEliminar = async () => {
+        try {
+            await eliminarProducto(productoAEliminar.id);
+            setAlerta({ tipo: 'exito', mensaje: 'Producto eliminado del catálogo' });
+        } catch (error) {
+            setAlerta({ tipo: 'error', mensaje: error.message });
+        } finally {
+            setProductoAEliminar(null);
+        }
+    };
 
     return (
         <div className="admin-layout">
             <Sidebar />
 
-            <main className="admin-main-container">
+            <main className="admin-main-container" style={{ position: 'relative' }}>
                 <TopBar />
 
-                <section className="page-content">
+                {alerta && <Alert tipo={alerta.tipo} mensaje={alerta.mensaje} />}
+                {errorCarga && <Alert tipo="error" mensaje={errorCarga} />}
 
-                    <div className="page-header">
-                        <h1 className="page-title">Consultar Productos</h1>
-                        <p className="page-subtitle">Busca y visualiza los productos agrícolas disponibles en el catálogo de SAMIFRUBER.</p>
+                <section className="page-content">
+                    <div className="page-header-row">
+                        <div className="page-header">
+                            <h1 className="page-title">Catálogo de productos</h1>
+                            <p className="page-subtitle">
+                                Busca un producto por nombre para ver stock, precio y estado. Desde aquí puedes actualizarlo o eliminarlo.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            className="btn-primary"
+                            onClick={() => navigate('/admin/productos/nuevo')}
+                        >
+                            Agregar producto
+                        </button>
                     </div>
 
-                    <div className="search-container" style={{ border: '1.5px solid #2E7D32' }}>
-                        {/* El buscador (simulando que buscó "Champiñones") */}
-                        <div className="search-icon-placeholder" style={{ borderColor: '#2E7D32' }}></div>
+                    <div className={`search-container${termino ? ' search-container-active' : ''}`}>
+                        <div className="search-icon-placeholder"></div>
                         <input
                             type="text"
                             className="search-input"
-                            placeholder="Ej. Fruta de dragón..."
-                            defaultValue="Champiñones"
+                            placeholder="Buscar por nombre. Ej. Champiñón..."
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
                         />
                     </div>
 
-                    {/* RENDERIZADO CONDICIONAL: 
-                        Si hay resultados en el arreglo, mostramos la tabla. 
-                        Si el arreglo está vacío, mostramos el empty state. */}
-
-                    {resultadosBusqueda.length > 0 ? (
-                        <ProductTable productos={resultadosBusqueda} />
+                    {cargando ? (
+                        <p style={{ color: '#8D6E63' }}>Cargando inventario...</p>
+                    ) : resultados.length > 0 ? (
+                        <ProductTable
+                            productos={resultados}
+                            onEliminar={setProductoAEliminar}
+                        />
                     ) : (
                         <div className="empty-state">
                             <div className="empty-state-icon-bg">
@@ -53,12 +91,23 @@ function ConsultarProductos() {
                             </div>
                             <div className="empty-state-text-container">
                                 <h2 className="empty-state-title">No existen coincidencias en el catálogo</h2>
-                                <p className="empty-state-desc">Prueba buscando con palabras clave diferentes o verifica la ortografía del término.</p>
+                                <p className="empty-state-desc">
+                                    Prueba buscando con palabras clave diferentes o verifica la ortografía del término.
+                                </p>
                             </div>
                         </div>
                     )}
-
                 </section>
+
+                {productoAEliminar && (
+                    <Modal
+                        titulo="Eliminar producto"
+                        mensaje={`¿Deseas eliminar "${productoAEliminar.nombre}" del catálogo? Esta acción no se puede deshacer.`}
+                        textoConfirmar="Eliminar producto"
+                        onConfirm={confirmarEliminar}
+                        onCancel={() => setProductoAEliminar(null)}
+                    />
+                )}
             </main>
         </div>
     );

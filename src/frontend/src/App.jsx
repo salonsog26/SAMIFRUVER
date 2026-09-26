@@ -1,9 +1,13 @@
-// Agrega esta primera línea obligatoria en tu App.jsx
 import React from 'react';
 import AppRouter from './routes/AppRouter';
+import { ProductosProvider } from './context/ProductosContext';
 
 function App() {
-    return <AppRouter />;
+    return (
+        <ProductosProvider>
+            <AppRouter />
+        </ProductosProvider>
+    );
 }
 
 export default App;
