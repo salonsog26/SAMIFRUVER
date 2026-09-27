@@ -47,6 +47,7 @@ function ProductTable({ productos = [], onEliminar }) {
                             />
                         </div>
                         <div className="col-nombre">{producto.nombre}</div>
+                        <div className="col-categoria">{producto.categoria}</div>
                         <div className="col-stock">{formatearStock(producto.stock, producto.unidad)}</div>
                         <div className="col-precio">{formatearPrecio(producto.precio, producto.unidad)}</div>
                         <div className="col-acciones">

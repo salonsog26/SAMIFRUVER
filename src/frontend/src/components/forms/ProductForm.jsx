@@ -36,10 +36,8 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
                         type="text"
                         name="nombre"
                         className="form-input"
-                        value={formData.nombre || ''}
-                        onChange={onChange}
+                        defaultValue={datosIniciales.nombre || ''}
                         placeholder="Ej. Pimentón, Tomate..."
-                        required
                     />
                 </div>
                 {errores.nombre && <span className="form-error-text">{errores.nombre}</span>}
@@ -67,9 +65,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
                         type="number"
                         name="precio"
                         className="form-input"
-                        value={formData.precio ?? ''}
-                        onChange={onChange}
-                        required
+                        defaultValue={datosIniciales.precio || ''}
                     />
                 </div>
                 {errores.precio && <span className="form-error-text">{errores.precio}</span>}
@@ -95,9 +91,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
                         type="number"
                         name="stock"
                         className="form-input"
-                        value={formData.stock ?? ''}
-                        onChange={onChange}
-                        required
+                        defaultValue={datosIniciales.stock || ''}
                     />
                 </div>
                 {errores.stock && <span className="form-error-text">{errores.stock}</span>}

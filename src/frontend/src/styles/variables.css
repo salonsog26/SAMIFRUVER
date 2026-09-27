@@ -385,6 +385,10 @@
     flex: 1;
 }
 
+.product-table-header .col-categoria {
+    width: 130px;
+}
+
 .product-table-header .col-stock {
     width: 120px;
 }
@@ -426,6 +430,12 @@
     color: #3E2723;
     font-size: 14px;
     font-weight: 600;
+}
+
+.col-categoria {
+    width: 130px;
+    color: #8D6E63;
+    font-size: 14px;
 }
 
 .col-stock {
