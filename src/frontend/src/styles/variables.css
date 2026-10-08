@@ -17,9 +17,15 @@
 /* --- SIDEBAR (MENÚ LATERAL) --- */
 .sidebar {
     width: 260px;
-    background-color: #FAF7F2;
-    border-right: 1px solid #E6DEC9;
+    background-color: #FFFFFF;
+    border-right: 1px solid #DDE7DF;
     padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar-top {
     display: flex;
     flex-direction: column;
     gap: 40px;
@@ -34,7 +40,7 @@
 .sidebar-logo-icon {
     width: 36px;
     height: 36px;
-    background-color: #2E7D32;
+    background-color: #20A34A;
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -48,7 +54,7 @@
 }
 
 .sidebar-brand {
-    color: #2E7D32;
+    color: #20A34A;
     font-size: 18px;
     font-family: 'Manrope', sans-serif;
     font-weight: 800;
@@ -75,7 +81,7 @@
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    color: #5D4037;
+    color: #10271B;
 }
 
 .menu-item.active {
@@ -83,25 +89,25 @@
 }
 
 .menu-item.active .menu-item-text {
-    color: #2E7D32;
+    color: #20A34A;
     font-weight: 700;
 }
 
 .menu-icon-placeholder {
     width: 14px;
     height: 14px;
-    border: 2px solid #8D6E63;
+    border: 2px solid #68786F;
 }
 
 .menu-item.active .menu-icon-placeholder {
-    border-color: #2E7D32;
+    border-color: #20A34A;
 }
 
 /* --- TOPBAR (BARRA SUPERIOR) --- */
 .topbar {
     height: 72px;
     background-color: white;
-    border-bottom: 1px solid #E6DEC9;
+    border-bottom: 1px solid #DDE7DF;
     padding: 0 32px;
     display: flex;
     justify-content: space-between;
@@ -109,7 +115,7 @@
 }
 
 .topbar-title {
-    color: #8D6E63;
+    color: #68786F;
     font-size: 14px;
     font-family: 'Manrope', sans-serif;
     font-weight: 700;
@@ -123,7 +129,7 @@
 }
 
 .topbar-role {
-    color: #3E2723;
+    color: #10271B;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
@@ -158,7 +164,7 @@
 }
 
 .page-title {
-    color: #3E2723;
+    color: #10271B;
     font-size: 28px;
     font-family: 'Manrope', sans-serif;
     font-weight: 800;
@@ -166,7 +172,7 @@
 }
 
 .page-subtitle {
-    color: #8D6E63;
+    color: #68786F;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     margin: 0;
@@ -177,7 +183,7 @@
     max-width: 640px;
     height: 48px;
     background-color: white;
-    border: 1px solid #E6DEC9;
+    border: 1px solid #DDE7DF;
     border-radius: 8px;
     padding: 0 16px;
     display: flex;
@@ -189,24 +195,24 @@
     flex: 1;
     border: none;
     outline: none;
-    color: #3E2723;
+    color: #10271B;
     font-size: 15px;
     font-family: 'Inter', sans-serif;
 }
 
 .search-container-active {
-    border: 1.5px solid #2E7D32;
+    border: 1.5px solid #20A34A;
 }
 
 .search-icon-placeholder {
     width: 15px;
     height: 15px;
-    border: 2px solid #8D6E63;
+    border: 2px solid #68786F;
 }
 
 .empty-state {
     padding: 80px 40px;
-    border: 1px solid #E6DEC9;
+    border: 1px solid #DDE7DF;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -217,7 +223,7 @@
 .empty-state-icon-bg {
     width: 80px;
     height: 80px;
-    background-color: #FAF7F2;
+    background-color: #F0F2F0;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -227,7 +233,7 @@
 .empty-state-icon {
     width: 31px;
     height: 33px;
-    border: 2px solid #8D6E63;
+    border: 2px solid #68786F;
 }
 
 .empty-state-text-container {
@@ -239,7 +245,7 @@
 }
 
 .empty-state-title {
-    color: #3E2723;
+    color: #10271B;
     font-size: 18px;
     font-family: 'Manrope', sans-serif;
     font-weight: 700;
@@ -247,7 +253,7 @@
 }
 
 .empty-state-desc {
-    color: #8D6E63;
+    color: #68786F;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     margin: 0;
@@ -260,7 +266,7 @@
     padding: 32px;
     background-color: white;
     border-radius: 16px;
-    border: 1px solid #E6DEC9;
+    border: 1px solid #DDE7DF;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -273,7 +279,7 @@
 }
 
 .form-label {
-    color: #3E2723;
+    color: #10271B;
     font-size: 14px;
     font-weight: 600;
 }
@@ -283,7 +289,7 @@
     padding: 0 16px;
     background-color: white;
     border-radius: 8px;
-    border: 1px solid #E6DEC9;
+    border: 1px solid #DDE7DF;
     display: flex;
     align-items: center;
 }
@@ -292,7 +298,7 @@
     flex: 1;
     border: none;
     outline: none;
-    color: #3E2723;
+    color: #10271B;
     font-size: 14px;
 }
 
@@ -305,7 +311,7 @@
 
 .btn-primary {
     padding: 14px 24px;
-    background-color: #2E7D32;
+    background-color: #20A34A;
     color: white;
     border: none;
     border-radius: 8px;
@@ -316,8 +322,8 @@
 .btn-secondary {
     padding: 14px 24px;
     background-color: white;
-    color: #5D4037;
-    border: 1px solid #E6DEC9;
+    color: #10271B;
+    border: 1px solid #DDE7DF;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
@@ -338,24 +344,24 @@
 
 .alert-success {
     background-color: #E8F5E9;
-    border: 1.5px solid #2E7D32;
+    border: 1.5px solid #20A34A;
     color: #1B5E20;
 }
 
 .alert-error {
-    background-color: #FFEBEE;
-    border: 1.5px solid #C62828;
-    color: #C62828;
+    background-color: #FFF1F0;
+    border: 1.5px solid #D92D20;
+    color: #D92D20;
 }
 
 /* --- ESTADOS DE ERROR EN FORMULARIOS --- */
 .form-input-wrapper.has-error {
-    background-color: #FFEBEE;
-    border: 1px solid #C62828;
+    background-color: #FFF1F0;
+    border: 1px solid #D92D20;
 }
 
 .form-error-text {
-    color: #C62828;
+    color: #D92D20;
     font-size: 12px;
     font-weight: 500;
     margin-top: 4px;
@@ -365,16 +371,16 @@
 .table-container {
     width: 100%;
     background: white;
-    border: 1px solid #E6DEC9;
+    border: 1px solid #DDE7DF;
     border-radius: 12px;
     overflow: hidden;
 }
 
 .product-table-header {
     display: flex;
-    background-color: #FAF7F2;
+    background-color: #F7F8F7;
     padding: 14px 24px;
-    border-bottom: 1px solid #E6DEC9;
+    border-bottom: 1px solid #DDE7DF;
 }
 
 .product-table-header .col-foto {
@@ -403,7 +409,7 @@
 }
 
 .table-header-text {
-    color: #8D6E63;
+    color: #68786F;
     font-size: 13px;
     font-weight: 700;
 }
@@ -412,7 +418,7 @@
     display: flex;
     align-items: center;
     padding: 12px 24px;
-    border-bottom: 1px solid #E6DEC9;
+    border-bottom: 1px solid #DDE7DF;
 }
 
 .product-table-row:last-child {
@@ -427,26 +433,26 @@
 
 .col-nombre {
     flex: 1;
-    color: #3E2723;
+    color: #10271B;
     font-size: 14px;
     font-weight: 600;
 }
 
 .col-categoria {
     width: 130px;
-    color: #8D6E63;
+    color: #68786F;
     font-size: 14px;
 }
 
 .col-stock {
     width: 120px;
-    color: #5D4037;
+    color: #68786F;
     font-size: 14px;
 }
 
 .col-precio {
     width: 150px;
-    color: #2E7D32;
+    color: #20A34A;
     font-size: 14px;
     font-weight: 700;
 }
@@ -467,7 +473,7 @@
 }
 
 .btn-table-primary {
-    background-color: #2E7D32;
+    background-color: #20A34A;
     color: white;
     border: none;
 }
@@ -556,7 +562,7 @@
 
 .badge-default {
     background-color: #F1F1F1;
-    color: #5D4037;
+    color: #68786F;
 }
 
 .badge-verduras {
@@ -601,7 +607,7 @@
 }
 
 .modal-title {
-    color: #3E2723;
+    color: #10271B;
     font-size: 18px;
     font-family: 'Manrope', sans-serif;
     font-weight: 800;
@@ -609,7 +615,7 @@
 }
 
 .modal-text {
-    color: #5D4037;
+    color: #68786F;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     margin: 0;
@@ -1001,4 +1007,144 @@
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 600;
+}
+/* --- SIDEBAR: BLOQUE DE USUARIO + CERRAR SESIÓN (abajo) --- */
+.sidebar-user-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 20px;
+    border-top: 1px solid #DDE7DF;
+}
+
+.sidebar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #20A34A;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.sidebar-user-name {
+    color: #10271B;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
+.sidebar-user-role {
+    color: #68786F;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #68786F;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+.sidebar-logout:hover {
+    color: #C62828;
+}
+
+.sidebar-logout-icon {
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+/* --- ENCABEZADO DE CONTENIDO (reemplaza a la antigua topbar) --- */
+.content-topbar {
+    height: 72px;
+    background-color: white;
+    border-bottom: 1px solid #DDE7DF;
+    padding: 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.breadcrumb-text {
+    color: #68786F;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.help-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #10271B;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+}
+
+.help-icon-placeholder {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+}
+
+/* --- BOTONES: ESTADO GRIS (inválido/deshabilitado) VS VERDE (válido) --- */
+.btn-primary-gris,
+.btn-primary:disabled,
+.btn-login {
+    background-color: #D1D5DB !important;
+    color: #6B7280 !important;
+    cursor: not-allowed !important;
+}
+
+.btn-login {
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-login-activo {
+    background-color: #20A34A !important;
+    color: white !important;
+    cursor: pointer !important;
+}
+
+/* --- ÍCONOS LUCIDE EN EL SIDEBAR --- */
+.menu-icon {
+    color: #68786F;
+    flex-shrink: 0;
+}
+
+.menu-item.active .menu-icon {
+    color: #20A34A;
 }

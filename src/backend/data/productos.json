@@ -6,7 +6,7 @@
     "categoria": "Especias",
     "stock": 45,
     "unidad": "lb",
-    "imagen": "https://placehold.co/280x220"
+    "imagen": "/images/jengibre.webp"
   },
   {
     "id": 2,
@@ -15,6 +15,6 @@
     "categoria": "Verduras",
     "stock": 120,
     "unidad": "lb",
-    "imagen": "https://placehold.co/280x220"
+    "imagen": "/images/tomate-chonto.webp"
   }
 ]

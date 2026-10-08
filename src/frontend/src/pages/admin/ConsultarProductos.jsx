@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar';
-import TopBar from '../../components/admin/TopBar';
+import ContentHeader from '../../components/admin/ContentHeader';
 import ProductTable from '../../components/admin/ProductTable';
 import Alert from '../../components/ui/Alert';
 import Modal from '../../components/ui/Modal';
@@ -44,7 +44,7 @@ function ConsultarProductos() {
             <Sidebar />
 
             <main className="admin-main-container" style={{ position: 'relative' }}>
-                <TopBar />
+                <ContentHeader migas="Panel de administrador / Productos" />
 
                 {alerta && <Alert tipo={alerta.tipo} mensaje={alerta.mensaje} />}
                 {errorCarga && <Alert tipo="error" mensaje={errorCarga} />}
@@ -78,7 +78,7 @@ function ConsultarProductos() {
                     </div>
 
                     {cargando ? (
-                        <p style={{ color: '#8D6E63' }}>Cargando inventario...</p>
+                        <p style={{ color: '#68786F' }}>Cargando inventario...</p>
                     ) : resultados.length > 0 ? (
                         <ProductTable
                             productos={resultados}

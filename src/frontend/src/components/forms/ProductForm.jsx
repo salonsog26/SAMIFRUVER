@@ -1,5 +1,5 @@
 // src/components/forms/ProductForm.jsx
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import '../../styles/variables.css';
 
 function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, onSubmit, onCancel }) {
@@ -17,6 +17,29 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
         };
     };
 
+    // Determina si, con los valores actuales del formulario, hay lo mínimo
+    // para intentar guardar (campos requeridos no vacíos, ignorando espacios).
+    const calcularValidez = () => {
+        const datos = obtenerDatosFormulario();
+        return (
+            Boolean(datos.nombre && datos.nombre.trim()) &&
+            Boolean(datos.categoria) &&
+            Boolean(datos.unidad) &&
+            datos.precio !== '' && !Number.isNaN(Number(datos.precio)) && Number(datos.precio) > 0 &&
+            datos.stock !== '' && !Number.isNaN(Number(datos.stock)) && Number(datos.stock) >= 0
+        );
+    };
+
+    const [formValido, setFormValido] = useState(() => {
+        // En modo edición, los datos iniciales ya vienen completos y válidos.
+        if (!modoEdicion) return false;
+        return Boolean(datosIniciales.nombre && datosIniciales.categoria && datosIniciales.unidad);
+    });
+
+    const actualizarValidez = () => {
+        setFormValido(calcularValidez());
+    };
+
     const manejarSubmit = (e) => {
         e.preventDefault();
         if (onSubmit) onSubmit(obtenerDatosFormulario());
@@ -27,7 +50,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
     };
 
     return (
-        <form ref={formRef} className="form-card" onSubmit={manejarSubmit}>
+        <form ref={formRef} className="form-card" onSubmit={manejarSubmit} onChange={actualizarValidez} onInput={actualizarValidez}>
 
             <div className="form-group">
                 <label className="form-label">Nombre del Producto</label>
@@ -66,6 +89,8 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
                         name="precio"
                         className="form-input"
                         defaultValue={datosIniciales.precio || ''}
+                        min="0"
+                        step="any"
                     />
                 </div>
                 {errores.precio && <span className="form-error-text">{errores.precio}</span>}
@@ -92,13 +117,15 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
                         name="stock"
                         className="form-input"
                         defaultValue={datosIniciales.stock || ''}
+                        min="0"
+                        step="1"
                     />
                 </div>
                 {errores.stock && <span className="form-error-text">{errores.stock}</span>}
             </div>
 
             <div className="button-group">
-                <button type="submit" className="btn-primary">
+                <button type="submit" className={`btn-primary${formValido ? '' : ' btn-primary-gris'}`} disabled={!formValido}>
                     {modoEdicion ? 'Guardar Cambios' : 'Guardar Producto'}
                 </button>
                 <button type="button" className="btn-secondary" onClick={manejarCancelar}>

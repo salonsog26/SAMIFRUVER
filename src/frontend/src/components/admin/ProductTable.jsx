@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { resolverImagen, alFallarImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
 
 function formatearPrecio(precio, unidad) {
@@ -19,7 +20,7 @@ function ProductTable({ productos = [], onEliminar }) {
     if (productos.length === 0) {
         return (
             <div className="table-container" style={{ padding: '40px', textAlign: 'center' }}>
-                <p style={{ color: '#8D6E63' }}>No hay productos para mostrar.</p>
+                <p style={{ color: '#68786F' }}>No hay productos para mostrar.</p>
             </div>
         );
     }
@@ -40,7 +41,8 @@ function ProductTable({ productos = [], onEliminar }) {
                     <div key={producto.id} className="product-table-row">
                         <div className="col-foto">
                             <img
-                                src={producto.imagen}
+                                src={resolverImagen(producto.imagen)}
+                                onError={alFallarImagen}
                                 alt={producto.nombre}
                                 className="product-image"
                                 style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }}

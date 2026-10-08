@@ -1,6 +1,7 @@
 // src/components/public/AuthHeroBanner.jsx
 import React from 'react';
 import logo from '../../assets/logo-samifruver.png';
+import bannerLogin from '../../assets/banner-login.webp';
 import '../../styles/variables.css';
 
 function AuthHeroBanner() {
@@ -8,7 +9,7 @@ function AuthHeroBanner() {
         <div className="auth-hero-section">
             <img
                 style={{ width: '100%', height: '100%', left: 0, top: 0, position: 'absolute', objectFit: 'cover' }}
-                src="https://placehold.co/650x900"
+                src={bannerLogin}
                 alt="Fondo agrícola"
             />
             <div style={{ width: '100%', height: '100%', left: 0, top: 0, position: 'absolute', background: 'linear-gradient(180deg, rgba(10, 42, 22, 0.05) 0%, rgba(10, 42, 22, 0.72) 100%)' }} />

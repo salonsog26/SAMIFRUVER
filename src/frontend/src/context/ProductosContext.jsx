@@ -9,15 +9,21 @@ export function validarProducto(datos) {
     if (!datos.nombre?.trim()) {
         errores.nombre = 'Este campo es obligatorio';
     }
-    if (datos.precio === '' || datos.precio == null || Number(datos.precio) <= 0) {
+
+    const precioNumero = Number(datos.precio);
+    if (datos.precio === '' || datos.precio == null || Number.isNaN(precioNumero) || precioNumero <= 0) {
         errores.precio = 'Ingresa un precio válido';
     }
+
     if (!datos.categoria) {
         errores.categoria = 'Selecciona una categoría';
     }
-    if (datos.stock === '' || datos.stock == null || Number(datos.stock) < 0) {
+
+    const stockNumero = Number(datos.stock);
+    if (datos.stock === '' || datos.stock == null || Number.isNaN(stockNumero) || stockNumero < 0) {
         errores.stock = 'Ingresa un stock válido';
     }
+
     if (!datos.unidad) {
         errores.unidad = 'Selecciona una unidad de medida';
     }

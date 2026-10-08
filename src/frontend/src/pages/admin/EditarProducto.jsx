@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar';
-import TopBar from '../../components/admin/TopBar';
+import ContentHeader from '../../components/admin/ContentHeader';
 import ProductForm from '../../components/forms/ProductForm';
 import Alert from '../../components/ui/Alert';
 import Modal from '../../components/ui/Modal';
@@ -79,9 +79,9 @@ function EditarProducto() {
             <div className="admin-layout">
                 <Sidebar />
                 <main className="admin-main-container">
-                    <TopBar />
+                    <ContentHeader migas="Panel de administrador / Productos / Editar" />
                     <section className="page-content">
-                        <p style={{ color: '#8D6E63' }}>Cargando producto...</p>
+                        <p style={{ color: '#68786F' }}>Cargando producto...</p>
                     </section>
                 </main>
             </div>
@@ -93,7 +93,7 @@ function EditarProducto() {
             <div className="admin-layout">
                 <Sidebar />
                 <main className="admin-main-container">
-                    <TopBar />
+                    <ContentHeader migas="Panel de administrador / Productos / Editar" />
                     <section className="page-content">
                         <div className="empty-state">
                             <div className="empty-state-text-container">
@@ -116,7 +116,7 @@ function EditarProducto() {
         <div className="admin-layout">
             <Sidebar />
             <main className="admin-main-container" style={{ position: 'relative' }}>
-                <TopBar />
+                <ContentHeader migas="Panel de administrador / Productos / Editar" />
 
                 {alerta && <Alert tipo={alerta.tipo} mensaje={alerta.mensaje} />}
 

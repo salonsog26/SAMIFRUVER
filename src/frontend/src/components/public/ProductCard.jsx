@@ -1,13 +1,14 @@
 // src/components/public/ProductCard.jsx
 import React from 'react';
 import Badge from '../ui/Badge';
+import { resolverImagen, alFallarImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
 
 function ProductCard({ nombre, categoria, precio, unidad = 'lb', imagen }) {
     return (
         <div className="product-card">
             <div className="product-card-image-wrapper">
-                <img src={imagen} alt={nombre} className="product-card-image" />
+                <img src={resolverImagen(imagen)} alt={nombre} className="product-card-image" onError={alFallarImagen} />
             </div>
             <div className="product-card-body">
                 <Badge categoria={categoria} />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar';
-import TopBar from '../../components/admin/TopBar';
+import ContentHeader from '../../components/admin/ContentHeader';
 import ProductForm from '../../components/forms/ProductForm';
 import Alert from '../../components/ui/Alert';
 import { useProductos, validarProducto } from '../../context/ProductosContext';
@@ -47,7 +47,7 @@ function RegistrarProducto() {
         <div className="admin-layout">
             <Sidebar />
             <main className="admin-main-container">
-                <TopBar />
+                <ContentHeader migas="Panel de administrador / Productos / Nuevo" />
 
                 {alerta && <Alert tipo={alerta.tipo} mensaje={alerta.mensaje} />}
 

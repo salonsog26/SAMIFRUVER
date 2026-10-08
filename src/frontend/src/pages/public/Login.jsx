@@ -7,6 +7,8 @@ import AuthInput from '../../components/forms/AuthInput';
 import { login } from '../../utils/auth';
 import '../../styles/variables.css';
 
+const correoValido = (valor) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+
 function Login() {
     const navigate = useNavigate();
     const [correo, setCorreo] = useState('');
@@ -15,22 +17,27 @@ function Login() {
     const [errorGeneral, setErrorGeneral] = useState('');
     const [enviando, setEnviando] = useState(false);
 
-    const correoValido = (valor) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+    // El botón solo se habilita (y se pone verde) cuando ambos campos
+    // tienen contenido real, sin contar espacios en blanco.
+    const formValido = correo.trim().length > 0 && contrasena.trim().length > 0;
 
     const manejarSubmit = async (e) => {
         e.preventDefault();
 
+        const correoLimpio = correo.trim();
+        const contrasenaLimpia = contrasena.trim();
+
         const nuevosErrores = {};
-        if (!correo.trim()) nuevosErrores.correo = 'El correo es obligatorio';
-        else if (!correoValido(correo)) nuevosErrores.correo = 'Correo no válido';
-        if (!contrasena.trim()) nuevosErrores.contrasena = 'La contraseña es obligatoria';
+        if (!correoLimpio) nuevosErrores.correo = 'El correo es obligatorio';
+        else if (!correoValido(correoLimpio)) nuevosErrores.correo = 'Correo no válido';
+        if (!contrasenaLimpia) nuevosErrores.contrasena = 'La contraseña es obligatoria';
 
         setErrores(nuevosErrores);
         setErrorGeneral('');
         if (Object.keys(nuevosErrores).length > 0) return;
 
         setEnviando(true);
-        const resultado = await login(correo, contrasena);
+        const resultado = await login(correoLimpio, contrasenaLimpia);
         setEnviando(false);
 
         if (!resultado.ok) {
@@ -40,6 +47,8 @@ function Login() {
 
         navigate('/admin/productos');
     };
+
+    const puedeEnviar = formValido && !enviando;
 
     return (
         <div className="auth-layout">
@@ -51,7 +60,7 @@ function Login() {
                 <div style={{ width: '100%', maxWidth: 500, display: 'flex', flexDirection: 'column', gap: 24 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         <h2 style={{ color: '#10271B', fontSize: 36, fontFamily: 'Inter', margin: 0 }}>Bienvenido de nuevo</h2>
-                        <p style={{ color: '#68786F', fontSize: 16, fontFamily: 'Inter', margin: 0 }}>Ingresa tus datos para continuar comprando productos frescos.</p>
+                        <p style={{ color: '#68786F', fontSize: 16, fontFamily: 'Inter', margin: 0 }}>Ingresa tus datos para continuar gestionando el inventario.</p>
                     </div>
 
                     <form onSubmit={manejarSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18, width: '100%' }}>
@@ -60,27 +69,18 @@ function Login() {
 
                         {errorGeneral && <p style={{ color: '#D92D20', fontSize: 14, fontFamily: 'Inter', margin: 0 }}>{errorGeneral}</p>}
 
-                        <div style={{ textAlign: 'right' }}>
-                            <a href="#forgot" style={{ color: '#20A34A', fontSize: 14, fontFamily: 'Inter', textDecoration: 'none' }}>¿Olvidaste tu contraseña?</a>
-                        </div>
-
                         <button
                             type="submit"
-                            disabled={enviando}
-                            style={{ height: 48, background: '#20A34A', color: 'white', border: 'none', borderRadius: 12, fontSize: 14, fontFamily: 'Inter', fontWeight: 700, cursor: enviando ? 'not-allowed' : 'pointer', opacity: enviando ? 0.7 : 1 }}
+                            className={`btn-login${puedeEnviar ? ' btn-login-activo' : ''}`}
+                            disabled={!puedeEnviar}
                         >
                             {enviando ? 'Ingresando...' : 'Ingresar'}
                         </button>
                     </form>
-
-                    <div style={{ textAlign: 'center', width: '100%' }}>
-                        <span style={{ color: '#68786F', fontSize: 14, fontFamily: 'Inter' }}>¿No tienes una cuenta? </span>
-                        <span style={{ color: '#20A34A', fontSize: 14, fontFamily: 'Inter', fontWeight: 700, cursor: 'pointer' }}>Regístrate aquí</span>
-                    </div>
                 </div>
 
                 <div style={{ textAlign: 'center', width: '100%', color: '#68786F', fontSize: 12, fontFamily: 'Inter' }}>
-                    Al continuar aceptas nuestros términos y política de privacidad.
+                    Acceso exclusivo para administradores de SAMIFRUVER.
                 </div>
             </div>
         </div>

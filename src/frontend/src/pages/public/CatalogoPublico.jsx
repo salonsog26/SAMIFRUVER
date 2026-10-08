@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import ProductCard from '../../components/public/ProductCard';
+import bannerCatalogo from '../../assets/banner-catalogo.webp';
+import { resolverImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
 
 function CatalogoPublico() {
@@ -21,7 +23,7 @@ function CatalogoPublico() {
                     categoria: prod.categoria,
                     precio: `$${prod.precio.toLocaleString()} COP`,
                     unidad: prod.unidad || 'lb',
-                    imagen: prod.imagen || 'https://placehold.co/280x220'
+                    imagen: resolverImagen(prod.imagen)
                 }));
                 setProductosDestacados(productosMapeados);
                 setCargando(false);
@@ -39,9 +41,10 @@ function CatalogoPublico() {
             {/* Hero */}
             <section className="public-hero">
                 <img
-                    src="https://placehold.co/1200x340"
+                    src={bannerCatalogo}
                     alt="Cosecha local"
                     className="public-hero-image"
+                    style={{ objectPosition: 'center 30%' }}
                 />
                 <div className="public-hero-overlay" />
                 <div className="public-hero-content">
