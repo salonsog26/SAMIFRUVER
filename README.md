@@ -45,4 +45,5 @@ Con la implementación de SAMIFRUVER, el flujo tradicional se moderniza:
 - **Analista:** Lesber Estanga Montezuma
 - **Desarrollador 1:** Diana Velasco Lasso
 - **Desarrollador 2:** Samuel Guevara Morales
+- **Desarrollador 3:** David Lopez Gomez
 - **Tester:** Nicolle Castro Cardozo
