@@ -1,4 +1,5 @@
 // src/pages/public/CatalogoPublico.jsx
+import { API_URL } from '../../utils/config';
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
@@ -14,7 +15,7 @@ function CatalogoPublico() {
 
 
     useEffect(() => {
-        fetch('http://localhost:4000/api/productos')
+        fetch(`${API_URL}/api/productos`)
             .then((res) => res.json())
             .then((data) => {
 

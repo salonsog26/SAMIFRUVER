@@ -9,11 +9,11 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
         const formEl = formRef.current;
         if (!formEl) return {};
         return {
-            nombre: formEl.nombre.value,
-            precio: formEl.precio.value,
-            categoria: formEl.categoria.value,
-            stock: formEl.stock.value,
-            unidad: formEl.unidad.value,
+            nombre: formEl.elements.namedItem('nombre').value,
+            precio: formEl.elements.namedItem('precio').value,
+            categoria: formEl.elements.namedItem('categoria').value,
+            stock: formEl.elements.namedItem('stock').value,
+            unidad: formEl.elements.namedItem('unidad').value,
         };
     };
 
@@ -53,11 +53,12 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
         <form ref={formRef} className="form-card" onSubmit={manejarSubmit} onChange={actualizarValidez} onInput={actualizarValidez}>
 
             <div className="form-group">
-                <label className="form-label">Nombre del Producto</label>
+                <label className="form-label" htmlFor="campo-nombre">Nombre del Producto</label>
                 <div className={`form-input-wrapper ${errores.nombre ? 'has-error' : ''}`}>
                     <input
                         type="text"
                         name="nombre"
+                        id="campo-nombre"
                         className="form-input"
                         defaultValue={datosIniciales.nombre || ''}
                         placeholder="Ej. Pimentón, Tomate..."
@@ -67,10 +68,11 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             </div>
 
             <div className="form-group">
-                <label className="form-label">Unidad de medida</label>
+                <label className="form-label" htmlFor="campo-unidad">Unidad de medida</label>
                 <div className={`form-input-wrapper ${errores.unidad ? 'has-error' : ''}`}>
                     <select
                         name="unidad"
+                        id="campo-unidad"
                         className="form-input"
                         defaultValue={datosIniciales.unidad || 'unidad'}
                     >
@@ -82,11 +84,12 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             </div>
 
             <div className="form-group">
-                <label className="form-label">Precio (COP)</label>
+                <label className="form-label" htmlFor="campo-precio">Precio (COP)</label>
                 <div className={`form-input-wrapper ${errores.precio ? 'has-error' : ''}`}>
                     <input
                         type="number"
                         name="precio"
+                        id="campo-precio"
                         className="form-input"
                         defaultValue={datosIniciales.precio || ''}
                         min="0"
@@ -97,9 +100,10 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             </div>
 
             <div className="form-group">
-                <label className="form-label">Categoría</label>
+                <label className="form-label" htmlFor="campo-categoria">Categoría</label>
                 <div className={`form-input-wrapper ${errores.categoria ? 'has-error' : ''}`}>
-                    <select name="categoria" className="form-input" defaultValue={datosIniciales.categoria || ''}>
+                    <select name="categoria"
+                        id="campo-categoria" className="form-input" defaultValue={datosIniciales.categoria || ''}>
                         <option value="">Seleccionar...</option>
                         <option value="Verduras">Verduras</option>
                         <option value="Frutas">Frutas</option>
@@ -110,15 +114,16 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             </div>
 
             <div className="form-group">
-                <label className="form-label">Stock disponible</label>
+                <label className="form-label" htmlFor="campo-stock">Stock disponible</label>
                 <div className={`form-input-wrapper ${errores.stock ? 'has-error' : ''}`}>
                     <input
                         type="number"
                         name="stock"
+                        id="campo-stock"
                         className="form-input"
                         defaultValue={datosIniciales.stock || ''}
                         min="0"
-                        step="1"
+                        step="any"
                     />
                 </div>
                 {errores.stock && <span className="form-error-text">{errores.stock}</span>}

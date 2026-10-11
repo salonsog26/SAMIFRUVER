@@ -1,29 +1,45 @@
 // src/backend/controllers/auth.controller.js
+const { leer, esTexto } = require('../lib/store');
 
-const loginAdmin = (req, res) => {
-    const correo = (req.body.correo || '').trim().toLowerCase();
-    const password = (req.body.password || '').trim();
+const ADMIN_CORREO = 'admin@samifruber.com';
+const ADMIN_PASSWORD = 'admin123';
+const TOKEN_ADMIN = 'mock-token-samifruber-12345';
+const MSJ_INCORRECTO = 'La información de inicio de sesión que ingresaste es incorrecta.';
 
-    // Credenciales de prueba para el administrador de SAMIFRUVER
-    const ADMIN_CORREO = "admin@samifruber.com";
-    const ADMIN_PASSWORD = "admin123";
+const normalizar = (body) => ({
+    correo: esTexto(body && body.correo) ? body.correo.trim().toLowerCase() : '',
+    password: esTexto(body && body.password) ? body.password.trim() : ''
+});
+
+// POST /api/auth/login  (E1-HU4 y E2-HU2: un solo endpoint para ambos roles)
+// Devuelve usuario.rol = 'admin' | 'cliente'.
+const login = (req, res) => {
+    const { correo, password } = normalizar(req.body);
 
     if (correo === ADMIN_CORREO && password === ADMIN_PASSWORD) {
-        res.json({
+        return res.json({
             success: true,
             mensaje: 'Autenticación exitosa',
-            token: 'mock-token-samifruber-12345', // Token simulado para la sesión
-            usuario: { correo: ADMIN_CORREO, rol: 'Administrador' }
-        });
-    } else {
-        // Mensaje genérico a propósito: no revela si falló el correo o la contraseña.
-        res.status(401).json({
-            success: false,
-            mensaje: 'Correo o contraseña incorrectos.'
+            token: TOKEN_ADMIN,
+            usuario: { correo: ADMIN_CORREO, nombre: 'Administrador', rol: 'admin' }
         });
     }
+
+    const cliente = correo && password
+        ? leer('clientes.json').find((c) => c.correo.toLowerCase() === correo && c.password === password)
+        : null;
+    if (cliente) {
+        const { password: _pw, ...datos } = cliente;
+        return res.json({
+            success: true,
+            mensaje: 'Inicio de sesión exitoso',
+            token: 'mock-token-cliente-' + cliente.id,
+            usuario: { ...datos, rol: 'cliente' }
+        });
+    }
+
+    // Mensaje genérico a propósito: no revela cuál dato falló.
+    res.status(401).json({ success: false, mensaje: MSJ_INCORRECTO });
 };
 
-module.exports = {
-    loginAdmin
-};
+module.exports = { login, loginAdmin: login };

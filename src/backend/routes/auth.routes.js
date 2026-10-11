@@ -1,8 +1,8 @@
 // src/backend/routes/auth.routes.js
 const express = require('express');
-const { loginAdmin } = require('../controllers/auth.controller');
+const { login } = require('../controllers/auth.controller');
 const router = express.Router();
 
-router.post('/login', loginAdmin);
+router.post('/login', login);
 
 module.exports = router;

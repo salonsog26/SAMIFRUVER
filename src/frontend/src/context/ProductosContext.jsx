@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-const ProductosContext = createContext(null);
+import { API_URL } from '../utils/config';
 
-const API_URL = 'http://localhost:4000';
+const ProductosContext = createContext(null);
 
 export function validarProducto(datos) {
     const errores = {};
-    if (!datos.nombre?.trim()) {
+    const nombre = (datos.nombre || '').trim();
+    if (!nombre) {
         errores.nombre = 'Este campo es obligatorio';
+    } else if (nombre.length < 2 || nombre.length > 60 || !/^[\p{L}\p{N}][\p{L}\p{N} .,'()\-]*$/u.test(nombre)) {
+        errores.nombre = 'Ingresa un nombre válido (2 a 60 caracteres, solo letras y números)';
     }
 
     const precioNumero = Number(datos.precio);

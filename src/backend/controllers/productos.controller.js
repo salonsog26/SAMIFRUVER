@@ -1,124 +1,82 @@
 // src/backend/controllers/productos.controller.js
-const fs = require('fs');
-const path = require('path');
+const { leer, escribir, siguienteId, esTexto } = require('../lib/store');
+const { validarCamposProducto } = require('../lib/validaciones');
 
-const filePath = path.join(__dirname, '../data/productos.json');
-
-const leerProductos = () => {
-    try {
-        const jsonData = fs.readFileSync(filePath, 'utf-8');
-        return JSON.parse(jsonData);
-    } catch (error) {
-        return [];
-    }
-};
-
-const escribirProductos = (productos) => {
-    fs.writeFileSync(filePath, JSON.stringify(productos, null, 2), 'utf-8');
-};
+const ARCHIVO = 'productos.json';
+const mismoNombre = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
 // 1. Obtener todos
 const obtenerProductos = (req, res) => {
-    const productos = leerProductos();
-    res.json(productos);
+    res.json(leer(ARCHIVO));
 };
 
-// Valida los campos de un producto. Devuelve un mensaje de error, o null si todo está bien.
-const validarCamposProducto = (body) => {
-    const nombre = (body.nombre || '').trim();
-    if (!nombre) return 'El nombre del producto es obligatorio.';
-
-    const precio = Number(body.precio);
-    if (body.precio === undefined || body.precio === '' || Number.isNaN(precio) || precio <= 0) {
-        return 'El precio debe ser un número mayor a 0.';
-    }
-
-    if (!body.categoria) return 'La categoría es obligatoria.';
-
-    const stock = Number(body.stock);
-    if (body.stock === undefined || body.stock === '' || Number.isNaN(stock) || stock < 0) {
-        return 'El stock debe ser un número mayor o igual a 0.';
-    }
-
-    return null;
-};
-
-// 2. Crear producto
+// 2. Crear producto (E1-HU1)
 const crearProducto = (req, res) => {
-    const errorValidacion = validarCamposProducto(req.body);
-    if (errorValidacion) {
-        return res.status(400).json({ mensaje: errorValidacion });
+    const body = req.body || {};
+    const errorValidacion = validarCamposProducto(body);
+    if (errorValidacion) return res.status(400).json({ mensaje: errorValidacion });
+
+    const productos = leer(ARCHIVO);
+    if (productos.some((p) => mismoNombre(p.nombre, body.nombre))) {
+        return res.status(409).json({ mensaje: 'El producto ya existe.' });
     }
 
-    const productos = leerProductos();
     const nuevoProducto = {
-        id: productos.length > 0 ? productos[productos.length - 1].id + 1 : 1,
-        nombre: req.body.nombre.trim(),
-        precio: Number(req.body.precio),
-        categoria: req.body.categoria,
-        stock: Number(req.body.stock),
-        unidad: req.body.unidad || 'lb',
-        imagen: req.body.imagen || '/images/producto-defecto.webp'
+        id: siguienteId(productos),
+        nombre: body.nombre.trim(),
+        precio: Number(body.precio),
+        categoria: body.categoria,
+        stock: Number(body.stock),
+        unidad: body.unidad || 'lb',
+        imagen: esTexto(body.imagen) && body.imagen ? body.imagen : '/images/producto-defecto.webp'
     };
 
     productos.push(nuevoProducto);
-    escribirProductos(productos);
+    escribir(ARCHIVO, productos);
     res.status(201).json({ mensaje: 'Producto registrado con éxito', producto: nuevoProducto });
 };
 
-// 3. Actualizar producto (PUT)
+// 3. Actualizar producto (E1-HU2). Admite actualización parcial.
 const actualizarProducto = (req, res) => {
-    const { id } = req.params;
-    let productos = leerProductos();
+    const body = req.body || {};
+    const productos = leer(ARCHIVO);
+    const index = productos.findIndex((p) => p.id === Number(req.params.id));
+    if (index === -1) return res.status(404).json({ mensaje: 'Producto no encontrado' });
 
-    const index = productos.findIndex(p => p.id === Number(id));
-    if (index === -1) {
-        return res.status(404).json({ mensaje: 'Producto no encontrado' });
-    }
-
-    // Solo valida los campos que realmente vienen en la petición (actualización parcial).
-    const datosAValidar = {
-        nombre: req.body.nombre !== undefined ? req.body.nombre : productos[index].nombre,
-        precio: req.body.precio !== undefined ? req.body.precio : productos[index].precio,
-        categoria: req.body.categoria !== undefined ? req.body.categoria : productos[index].categoria,
-        stock: req.body.stock !== undefined ? req.body.stock : productos[index].stock,
+    const actual = productos[index];
+    const combinado = {
+        nombre: body.nombre !== undefined ? body.nombre : actual.nombre,
+        precio: body.precio !== undefined ? body.precio : actual.precio,
+        categoria: body.categoria !== undefined ? body.categoria : actual.categoria,
+        stock: body.stock !== undefined ? body.stock : actual.stock,
+        unidad: body.unidad !== undefined ? body.unidad : actual.unidad
     };
-    const errorValidacion = validarCamposProducto(datosAValidar);
-    if (errorValidacion) {
-        return res.status(400).json({ mensaje: errorValidacion });
+    const errorValidacion = validarCamposProducto(combinado);
+    if (errorValidacion) return res.status(400).json({ mensaje: errorValidacion });
+
+    if (productos.some((p, i) => i !== index && mismoNombre(p.nombre, combinado.nombre))) {
+        return res.status(409).json({ mensaje: 'El producto ya existe.' });
     }
 
     productos[index] = {
-        ...productos[index],
-        nombre: req.body.nombre !== undefined ? req.body.nombre.trim() : productos[index].nombre,
-        precio: req.body.precio !== undefined ? Number(req.body.precio) : productos[index].precio,
-        categoria: req.body.categoria || productos[index].categoria,
-        stock: req.body.stock !== undefined ? Number(req.body.stock) : productos[index].stock,
-        unidad: req.body.unidad || productos[index].unidad
+        ...actual,
+        nombre: combinado.nombre.trim(),
+        precio: Number(combinado.precio),
+        categoria: combinado.categoria,
+        stock: Number(combinado.stock),
+        unidad: combinado.unidad
     };
-
-    escribirProductos(productos);
+    escribir(ARCHIVO, productos);
     res.json({ mensaje: 'Producto actualizado con éxito', producto: productos[index] });
 };
 
-// 4. Eliminar producto (DELETE)
+// 4. Eliminar producto
 const eliminarProducto = (req, res) => {
-    const { id } = req.params;
-    let productos = leerProductos();
-
-    const productosFiltrados = productos.filter(p => p.id !== Number(id));
-
-    if (productos.length === productosFiltrados.length) {
-        return res.status(404).json({ mensaje: 'Producto no encontrado' });
-    }
-
-    escribirProductos(productosFiltrados);
+    const productos = leer(ARCHIVO);
+    const filtrados = productos.filter((p) => p.id !== Number(req.params.id));
+    if (filtrados.length === productos.length) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    escribir(ARCHIVO, filtrados);
     res.json({ mensaje: 'Producto eliminado con éxito' });
 };
 
-module.exports = {
-    obtenerProductos,
-    crearProducto,
-    actualizarProducto,
-    eliminarProducto
-};
+module.exports = { obtenerProductos, crearProducto, actualizarProducto, eliminarProducto };
