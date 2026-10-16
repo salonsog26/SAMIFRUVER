@@ -1,9 +1,11 @@
-// src/components/forms/ProductForm.jsx
 import React, { useRef, useState } from 'react';
 import '../../styles/variables.css';
 
 function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, onSubmit, onCancel }) {
     const formRef = useRef(null);
+    const [previewImagen, setPreviewImagen] = useState(datosIniciales.imagen || null);
+    const [imagenBase64, setImagenBase64] = useState(datosIniciales.imagen || '');
+    const [errorImagen, setErrorImagen] = useState('');
 
     const obtenerDatosFormulario = () => {
         const formEl = formRef.current;
@@ -14,36 +16,84 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             categoria: formEl.categoria.value,
             stock: formEl.stock.value,
             unidad: formEl.unidad.value,
+            imagen: imagenBase64,
         };
     };
 
-    // Determina si, con los valores actuales del formulario, hay lo mínimo
-    // para intentar guardar (campos requeridos no vacíos, ignorando espacios).
-    const calcularValidez = () => {
-        const datos = obtenerDatosFormulario();
-        return (
-            Boolean(datos.nombre && datos.nombre.trim()) &&
-            Boolean(datos.categoria) &&
-            Boolean(datos.unidad) &&
-            datos.precio !== '' && !Number.isNaN(Number(datos.precio)) && Number(datos.precio) > 0 &&
-            datos.stock !== '' && !Number.isNaN(Number(datos.stock)) && Number(datos.stock) >= 0
-        );
-    };
-
-    const [formValido, setFormValido] = useState(() => {
-        // En modo edición, los datos iniciales ya vienen completos y válidos.
-        if (!modoEdicion) return false;
-        return Boolean(datosIniciales.nombre && datosIniciales.categoria && datosIniciales.unidad);
-    });
-
+const calcularValidez = () => {
+    const datos = obtenerDatosFormulario();
+    return (
+        Boolean(datos.nombre && datos.nombre.trim()) &&
+        Boolean(datos.categoria) &&
+        Boolean(datos.unidad) &&
+        Boolean(datos.imagen) &&
+        datos.precio !== '' && !Number.isNaN(Number(datos.precio)) && Number(datos.precio) > 0 &&
+        datos.stock !== '' && !Number.isNaN(Number(datos.stock)) && Number(datos.stock) >= 0
+    );
+};
+const [formValido, setFormValido] = useState(() => {
+    if (!modoEdicion) return false;
+    return Boolean(datosIniciales.nombre && datosIniciales.categoria && datosIniciales.unidad && datosIniciales.imagen);
+});
     const actualizarValidez = () => {
         setFormValido(calcularValidez());
     };
 
-    const manejarSubmit = (e) => {
-        e.preventDefault();
-        if (onSubmit) onSubmit(obtenerDatosFormulario());
+    const manejarCambioImagen = (e) => {
+        const archivo = e.target.files[0];
+        if (!archivo) return;
+
+        const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!tiposPermitidos.includes(archivo.type)) {
+            setErrorImagen('Solo se permiten imágenes JPG, PNG o WEBP');
+            e.target.value = '';
+            return;
+        }
+
+        const maxBytes = 2 * 1024 * 1024; // 2MB
+        if (archivo.size > maxBytes) {
+            setErrorImagen('La imagen no debe superar 2MB');
+            e.target.value = '';
+            return;
+        }
+
+        const urlTemporal = URL.createObjectURL(archivo);
+        const img = new Image();
+        img.onload = () => {
+            if (img.naturalWidth < 300 || img.naturalHeight < 300) {
+                setErrorImagen('La imagen debe tener al menos 300x300 píxeles');
+                e.target.value = '';
+                URL.revokeObjectURL(urlTemporal);
+                return;
+            }
+
+            setErrorImagen('');
+            setPreviewImagen(urlTemporal);
+
+            // Convierte el archivo a base64 para enviarlo como texto al backend
+            const lector = new FileReader();
+            lector.onload = () => {
+                setImagenBase64(lector.result);
+                setFormValido(calcularValidez());
+            };
+            lector.readAsDataURL(archivo);
+        };
+        img.onerror = () => {
+            setErrorImagen('No se pudo leer el archivo como imagen');
+            e.target.value = '';
+        };
+        img.src = urlTemporal;
     };
+
+const manejarSubmit = (e) => {
+    e.preventDefault();
+    const datos = obtenerDatosFormulario();
+    if (!datos.imagen) {
+        setErrorImagen('Debes subir una foto del producto');
+        return;
+    }
+    if (onSubmit) onSubmit(datos);
+};
 
     const manejarCancelar = () => {
         if (onCancel) onCancel(obtenerDatosFormulario());
@@ -67,13 +117,26 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             </div>
 
             <div className="form-group">
+                <label className="form-label">Foto del producto</label>
+                <div className={`form-input-wrapper ${errorImagen ? 'has-error' : ''}`} style={{ height: 'auto', padding: '12px 16px' }}>
+                    <input
+                        type="file"
+                        name="imagenArchivo"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="form-input"
+                        onChange={manejarCambioImagen}
+                    />
+                </div>
+                {errorImagen && <span className="form-error-text">{errorImagen}</span>}
+                {previewImagen && (
+                    <img src={previewImagen} alt="Vista previa" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, marginTop: 8 }} />
+                )}
+            </div>
+
+            <div className="form-group">
                 <label className="form-label">Unidad de medida</label>
                 <div className={`form-input-wrapper ${errores.unidad ? 'has-error' : ''}`}>
-                    <select
-                        name="unidad"
-                        className="form-input"
-                        defaultValue={datosIniciales.unidad || 'unidad'}
-                    >
+                    <select name="unidad" className="form-input" defaultValue={datosIniciales.unidad || 'unidad'}>
                         <option value="unidad">Por unidad</option>
                         <option value="lb">Por libra</option>
                     </select>
@@ -84,14 +147,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             <div className="form-group">
                 <label className="form-label">Precio (COP)</label>
                 <div className={`form-input-wrapper ${errores.precio ? 'has-error' : ''}`}>
-                    <input
-                        type="number"
-                        name="precio"
-                        className="form-input"
-                        defaultValue={datosIniciales.precio || ''}
-                        min="0"
-                        step="any"
-                    />
+                    <input type="number" name="precio" className="form-input" defaultValue={datosIniciales.precio || ''} min="0" step="any" />
                 </div>
                 {errores.precio && <span className="form-error-text">{errores.precio}</span>}
             </div>
@@ -112,14 +168,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             <div className="form-group">
                 <label className="form-label">Stock disponible</label>
                 <div className={`form-input-wrapper ${errores.stock ? 'has-error' : ''}`}>
-                    <input
-                        type="number"
-                        name="stock"
-                        className="form-input"
-                        defaultValue={datosIniciales.stock || ''}
-                        min="0"
-                        step="1"
-                    />
+                    <input type="number" name="stock" className="form-input" defaultValue={datosIniciales.stock || ''} min="0" step="1" />
                 </div>
                 {errores.stock && <span className="form-error-text">{errores.stock}</span>}
             </div>

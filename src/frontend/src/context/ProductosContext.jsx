@@ -6,27 +6,43 @@ const API_URL = 'http://localhost:4000';
 
 export function validarProducto(datos) {
     const errores = {};
-    if (!datos.nombre?.trim()) {
+    const nombreCrudo = datos.nombre || '';
+    const nombre = nombreCrudo.trim();
+
+    if (!nombre) {
         errores.nombre = 'Este campo es obligatorio';
+    } else if (/\s{2,}/.test(nombreCrudo)) {
+        errores.nombre = 'El nombre no puede tener espacios dobles';
+    } else if (!/^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ ]+$/.test(nombre)) {
+        errores.nombre = 'El nombre solo puede contener letras y espacios';
+    } else if (nombre.length < 2) {
+        errores.nombre = 'El nombre es demasiado corto';
     }
 
-    const precioNumero = Number(datos.precio);
-    if (datos.precio === '' || datos.precio == null || Number.isNaN(precioNumero) || precioNumero <= 0) {
-        errores.precio = 'Ingresa un precio válido';
+    if (datos.precio === '' || datos.precio == null) {
+        errores.precio = 'El precio es obligatorio';
+    } else if (!/^\d+(\.\d+)?$/.test(String(datos.precio).trim())) {
+        errores.precio = 'El precio debe ser un número válido';
+    } else if (Number(datos.precio) <= 0) {
+        errores.precio = 'El precio debe ser mayor que cero';
     }
 
     if (!datos.categoria) {
         errores.categoria = 'Selecciona una categoría';
     }
 
-    const stockNumero = Number(datos.stock);
-    if (datos.stock === '' || datos.stock == null || Number.isNaN(stockNumero) || stockNumero < 0) {
-        errores.stock = 'Ingresa un stock válido';
+    if (datos.stock === '' || datos.stock == null) {
+        errores.stock = 'El stock es obligatorio';
+    } else if (!/^\d+$/.test(String(datos.stock).trim())) {
+        errores.stock = 'El stock debe ser un número entero válido (sin decimales)';
+    } else if (Number(datos.stock) < 0) {
+        errores.stock = 'El stock no puede ser negativo';
     }
 
     if (!datos.unidad) {
         errores.unidad = 'Selecciona una unidad de medida';
     }
+
     return errores;
 }
 
@@ -61,7 +77,6 @@ export function ProductosProvider({ children }) {
 
         obtenerPorId: (id) => productos.find((producto) => String(producto.id) === String(id)),
 
-        // Devuelve el producto creado o lanza un error con un mensaje legible.
         agregarProducto: async (datos) => {
             const respuesta = await fetch(`${API_URL}/api/productos`, {
                 method: 'POST',
@@ -71,7 +86,8 @@ export function ProductosProvider({ children }) {
                     precio: Number(datos.precio),
                     categoria: datos.categoria,
                     stock: Number(datos.stock),
-                    unidad: datos.unidad || 'lb'
+                    unidad: datos.unidad || 'lb',
+                    imagen: datos.imagen || ''
                 })
             });
             const data = await respuesta.json();
@@ -90,7 +106,8 @@ export function ProductosProvider({ children }) {
                     precio: Number(datos.precio),
                     categoria: datos.categoria,
                     stock: Number(datos.stock),
-                    unidad: datos.unidad || 'lb'
+                    unidad: datos.unidad || 'lb',
+                    imagen: datos.imagen || ''
                 })
             });
             const data = await respuesta.json();

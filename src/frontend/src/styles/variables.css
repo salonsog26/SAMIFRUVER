@@ -1194,3 +1194,18 @@ body {
 .menu-item.active .menu-icon {
     color: #20A34A;
 }
+.form-label {
+    color: #10271B;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    color: #10271B;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+}

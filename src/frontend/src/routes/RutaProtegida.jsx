@@ -12,4 +12,4 @@ function RutaProtegida({ rolRequerido, children }) {
     return children;
 }
 
-export default RutaProtegida;
+
