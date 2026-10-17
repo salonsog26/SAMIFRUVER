@@ -1,13 +1,16 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutGrid, PackagePlus, LogOut } from 'lucide-react';
+import { LayoutGrid, PackagePlus, LogOut, X } from 'lucide-react';
 import logo from '../../assets/logo-samifruver.png';
 import { obtenerSesion, cerrarSesion } from '../../utils/auth';
+import useMenuLateral from '../../utils/useMenuLateral';
+import BarraMovil from './BarraMovil';
 import '../../styles/variables.css';
 
 function Sidebar() {
     const navigate = useNavigate();
     const sesion = obtenerSesion();
+    const { abierto, abrir, cerrar } = useMenuLateral();
 
     const iniciales = (sesion?.correo || 'AD')
         .split('@')[0]
@@ -20,10 +23,16 @@ function Sidebar() {
     };
 
     return (
-        <aside className="sidebar">
+        <>
+        <BarraMovil abierto={abierto} onAbrir={abrir} />
+        {abierto && <div className="sidebar-backdrop" onClick={cerrar} />}
+        <aside className={`sidebar${abierto ? ' abierto' : ''}`}>
             <div className="sidebar-top">
                 <div className="sidebar-logo-container">
                     <img src={logo} alt="Samifruver" style={{ height: 36, width: 'auto' }} />
+                    <button type="button" className="sidebar-cerrar" aria-label="Cerrar menú" onClick={cerrar}>
+                        <X size={20} />
+                    </button>
                 </div>
 
                 <nav className="sidebar-menu">
@@ -60,6 +69,7 @@ function Sidebar() {
                 </button>
             </div>
         </aside>
+        </>
     );
 }
 

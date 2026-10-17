@@ -1,49 +1,76 @@
-// src/backend/controllers/productos.controller.js
-const { leer, escribir, siguienteId, esTexto } = require('../lib/store');
+// src/backend/controllers/productos.controller.js — catálogo de productos (Épica 1)
+const { query, esDuplicado } = require('../lib/db');
+const { esTexto, asincrono, idDeUrl } = require('../lib/util');
 const { validarCamposProducto } = require('../lib/validaciones');
 
-const ARCHIVO = 'productos.json';
-const mismoNombre = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+const MSJ_DUPLICADO = 'El producto ya existe.';
+const MSJ_NO_ENCONTRADO = 'Producto no encontrado';
 
-// 1. Obtener todos
-const obtenerProductos = (req, res) => {
-    res.json(leer(ARCHIVO));
+// Mismo formato JSON que usaba el frontend: categoria como texto, precio y stock como número.
+const SELECT_PRODUCTO = `
+    SELECT p.id, p.nombre, p.precio, c.nombre AS categoria, p.stock, p.unidad, p.imagen
+    FROM productos p
+    JOIN categorias c ON c.id = p.categoria_id`;
+
+const aProducto = (r) => ({
+    id: r.id,
+    nombre: r.nombre,
+    precio: Number(r.precio),
+    categoria: r.categoria,
+    stock: Number(r.stock),
+    unidad: r.unidad,
+    imagen: r.imagen
+});
+
+const buscarPorId = async (id) => {
+    const { rows } = await query(`${SELECT_PRODUCTO} WHERE p.id = $1`, [id]);
+    return rows[0] ? aProducto(rows[0]) : null;
 };
 
+const mismoNombre = async (nombre, exceptoId = null) => {
+    const { rows } = await query(
+        'SELECT 1 FROM productos WHERE LOWER(nombre) = LOWER($1) AND ($2::int IS NULL OR id <> $2) LIMIT 1',
+        [nombre.trim(), exceptoId]
+    );
+    return rows.length > 0;
+};
+
+// 1. Obtener todos
+const obtenerProductos = asincrono(async (req, res) => {
+    const { rows } = await query(`${SELECT_PRODUCTO} ORDER BY p.id`);
+    res.json(rows.map(aProducto));
+});
+
 // 2. Crear producto (E1-HU1)
-const crearProducto = (req, res) => {
+const crearProducto = asincrono(async (req, res) => {
     const body = req.body || {};
     const errorValidacion = validarCamposProducto(body);
     if (errorValidacion) return res.status(400).json({ mensaje: errorValidacion });
 
-    const productos = leer(ARCHIVO);
-    if (productos.some((p) => mismoNombre(p.nombre, body.nombre))) {
-        return res.status(409).json({ mensaje: 'El producto ya existe.' });
+    if (await mismoNombre(body.nombre)) return res.status(409).json({ mensaje: MSJ_DUPLICADO });
+
+    const imagen = esTexto(body.imagen) && body.imagen ? body.imagen : '/images/producto-defecto.webp';
+    try {
+        const { rows } = await query(
+            `INSERT INTO productos (nombre, precio, categoria_id, stock, unidad, imagen)
+             VALUES ($1, $2, (SELECT id FROM categorias WHERE nombre = $3), $4, $5, $6)
+             RETURNING id`,
+            [body.nombre.trim(), Number(body.precio), body.categoria, Number(body.stock), body.unidad || 'lb', imagen]
+        );
+        res.status(201).json({ mensaje: 'Producto registrado con éxito', producto: await buscarPorId(rows[0].id) });
+    } catch (error) {
+        if (esDuplicado(error)) return res.status(409).json({ mensaje: MSJ_DUPLICADO });
+        throw error;
     }
-
-    const nuevoProducto = {
-        id: siguienteId(productos),
-        nombre: body.nombre.trim(),
-        precio: Number(body.precio),
-        categoria: body.categoria,
-        stock: Number(body.stock),
-        unidad: body.unidad || 'lb',
-        imagen: esTexto(body.imagen) && body.imagen ? body.imagen : '/images/producto-defecto.webp'
-    };
-
-    productos.push(nuevoProducto);
-    escribir(ARCHIVO, productos);
-    res.status(201).json({ mensaje: 'Producto registrado con éxito', producto: nuevoProducto });
-};
+});
 
 // 3. Actualizar producto (E1-HU2). Admite actualización parcial.
-const actualizarProducto = (req, res) => {
+const actualizarProducto = asincrono(async (req, res) => {
     const body = req.body || {};
-    const productos = leer(ARCHIVO);
-    const index = productos.findIndex((p) => p.id === Number(req.params.id));
-    if (index === -1) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    const id = idDeUrl(req.params.id);
+    const actual = id === null ? null : await buscarPorId(id);
+    if (!actual) return res.status(404).json({ mensaje: MSJ_NO_ENCONTRADO });
 
-    const actual = productos[index];
     const combinado = {
         nombre: body.nombre !== undefined ? body.nombre : actual.nombre,
         precio: body.precio !== undefined ? body.precio : actual.precio,
@@ -54,29 +81,31 @@ const actualizarProducto = (req, res) => {
     const errorValidacion = validarCamposProducto(combinado);
     if (errorValidacion) return res.status(400).json({ mensaje: errorValidacion });
 
-    if (productos.some((p, i) => i !== index && mismoNombre(p.nombre, combinado.nombre))) {
-        return res.status(409).json({ mensaje: 'El producto ya existe.' });
-    }
+    if (await mismoNombre(combinado.nombre, id)) return res.status(409).json({ mensaje: MSJ_DUPLICADO });
 
-    productos[index] = {
-        ...actual,
-        nombre: combinado.nombre.trim(),
-        precio: Number(combinado.precio),
-        categoria: combinado.categoria,
-        stock: Number(combinado.stock),
-        unidad: combinado.unidad
-    };
-    escribir(ARCHIVO, productos);
-    res.json({ mensaje: 'Producto actualizado con éxito', producto: productos[index] });
-};
+    // La imagen solo cambia si viene una nueva (texto no vacío).
+    const imagen = esTexto(body.imagen) && body.imagen ? body.imagen : actual.imagen;
+    try {
+        await query(
+            `UPDATE productos
+                SET nombre = $1, precio = $2, categoria_id = (SELECT id FROM categorias WHERE nombre = $3),
+                    stock = $4, unidad = $5, imagen = $6, actualizado_en = now()
+              WHERE id = $7`,
+            [combinado.nombre.trim(), Number(combinado.precio), combinado.categoria, Number(combinado.stock), combinado.unidad, imagen, id]
+        );
+        res.json({ mensaje: 'Producto actualizado con éxito', producto: await buscarPorId(id) });
+    } catch (error) {
+        if (esDuplicado(error)) return res.status(409).json({ mensaje: MSJ_DUPLICADO });
+        throw error;
+    }
+});
 
 // 4. Eliminar producto
-const eliminarProducto = (req, res) => {
-    const productos = leer(ARCHIVO);
-    const filtrados = productos.filter((p) => p.id !== Number(req.params.id));
-    if (filtrados.length === productos.length) return res.status(404).json({ mensaje: 'Producto no encontrado' });
-    escribir(ARCHIVO, filtrados);
+const eliminarProducto = asincrono(async (req, res) => {
+    const id = idDeUrl(req.params.id);
+    const resultado = id === null ? { rowCount: 0 } : await query('DELETE FROM productos WHERE id = $1', [id]);
+    if (resultado.rowCount === 0) return res.status(404).json({ mensaje: MSJ_NO_ENCONTRADO });
     res.json({ mensaje: 'Producto eliminado con éxito' });
-};
+});
 
 module.exports = { obtenerProductos, crearProducto, actualizarProducto, eliminarProducto };

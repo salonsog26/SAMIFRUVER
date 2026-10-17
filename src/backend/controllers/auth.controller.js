@@ -1,9 +1,8 @@
-// src/backend/controllers/auth.controller.js
-const { leer, esTexto } = require('../lib/store');
+// src/backend/controllers/auth.controller.js — inicio de sesión unificado (admin y cliente)
+const { query } = require('../lib/db');
+const { esTexto, asincrono } = require('../lib/util');
+const passwords = require('../lib/passwords');
 
-const ADMIN_CORREO = 'admin@samifruver.com';
-const ADMIN_CORREO_ALTERNO = 'admin@samifruber.com';
-const ADMIN_PASSWORD = 'admin123';
 const TOKEN_ADMIN = 'mock-token-samifruber-12345';
 const MSJ_INCORRECTO = 'La información de inicio de sesión que ingresaste es incorrecta.';
 
@@ -12,33 +11,39 @@ const normalizar = (body) => ({
     password: esTexto(body && body.password) ? body.password.trim() : ''
 });
 
-const login = (req, res) => {
+const login = asincrono(async (req, res) => {
     const { correo, password } = normalizar(req.body);
 
-    if ((correo === ADMIN_CORREO || correo === ADMIN_CORREO_ALTERNO) && password === ADMIN_PASSWORD) {
-        return res.json({
-            success: true,
-            mensaje: 'Autenticación exitosa',
-            token: TOKEN_ADMIN,
-            usuario: { correo, nombre: 'Administrador', rol: 'admin' }
-        });
-    }
+    if (correo && password) {
+        // 1) ¿Es administrador?
+        const admin = (await query('SELECT nombre, correo, password_hash FROM administradores WHERE LOWER(correo) = $1', [correo])).rows[0];
+        if (admin && (await passwords.verificar(password, admin.password_hash))) {
+            return res.json({
+                success: true,
+                mensaje: 'Autenticación exitosa',
+                token: TOKEN_ADMIN,
+                usuario: { correo: admin.correo, nombre: admin.nombre, rol: 'admin' }
+            });
+        }
 
-    const cliente = correo && password
-        ? leer('clientes.json').find((c) => c.correo.toLowerCase() === correo && c.password === password)
-        : null;
-    if (cliente) {
-        const { password: _pw, ...datos } = cliente;
-        return res.json({
-            success: true,
-            mensaje: 'Inicio de sesión exitoso',
-            token: 'mock-token-cliente-' + cliente.id,
-            usuario: { ...datos, rol: 'cliente' }
-        });
+        // 2) ¿Es cliente?
+        const cliente = (await query(
+            'SELECT id, nombre, correo, telefono, documento, direccion, ciudad, password_hash FROM clientes WHERE LOWER(correo) = $1',
+            [correo]
+        )).rows[0];
+        if (cliente && (await passwords.verificar(password, cliente.password_hash))) {
+            const { password_hash, ...datos } = cliente;
+            return res.json({
+                success: true,
+                mensaje: 'Inicio de sesión exitoso',
+                token: 'mock-token-cliente-' + cliente.id,
+                usuario: { ...datos, rol: 'cliente' }
+            });
+        }
     }
 
     // Mensaje genérico a propósito: no revela cuál dato falló.
     res.status(401).json({ success: false, mensaje: MSJ_INCORRECTO });
-};
+});
 
 module.exports = { login, loginAdmin: login };

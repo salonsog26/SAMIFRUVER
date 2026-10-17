@@ -6,6 +6,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
     const [previewImagen, setPreviewImagen] = useState(datosIniciales.imagen || null);
     const [imagenBase64, setImagenBase64] = useState(datosIniciales.imagen || '');
     const [errorImagen, setErrorImagen] = useState('');
+    const imagenRef = useRef(datosIniciales.imagen || '');
 
     const obtenerDatosFormulario = () => {
         const formEl = formRef.current;
@@ -16,6 +17,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             categoria: formEl.elements.namedItem('categoria').value,
             stock: formEl.elements.namedItem('stock').value,
             unidad: formEl.elements.namedItem('unidad').value,
+            imagen: imagenRef.current,
         };
     };
 
@@ -72,6 +74,7 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
             // Convierte el archivo a base64 para enviarlo como texto al backend
             const lector = new FileReader();
             lector.onload = () => {
+                imagenRef.current = lector.result;
                 setImagenBase64(lector.result);
                 setFormValido(calcularValidez());
             };
@@ -176,6 +179,24 @@ function ProductForm({ modoEdicion = false, datosIniciales = {}, errores = {}, o
                     />
                 </div>
                 {errores.stock && <span className="form-error-text">{errores.stock}</span>}
+            </div>
+
+            <div className="form-group">
+                <label className="form-label" htmlFor="campo-imagen">Foto del producto</label>
+                <div className={`form-input-wrapper ${errorImagen ? 'has-error' : ''}`}>
+                    <input
+                        type="file"
+                        id="campo-imagen"
+                        name="imagenArchivo"
+                        className="form-input"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={manejarCambioImagen}
+                    />
+                </div>
+                {previewImagen && (
+                    <img src={previewImagen} alt="Vista previa del producto" className="form-preview-imagen" />
+                )}
+                {errorImagen && <span className="form-error-text">{errorImagen}</span>}
             </div>
 
             <div className="button-group">

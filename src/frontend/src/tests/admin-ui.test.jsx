@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ConsultarProductos from '../pages/admin/ConsultarProductos';
@@ -16,6 +16,20 @@ const rutas = [
 const base = { 'GET /api/productos': { json: PRODUCTOS } };
 
 beforeEach(() => ponerSesion(SESION_ADMIN));
+
+// jsdom no decodifica imágenes: simulamos una de 400x400 para el campo "Foto del producto"
+beforeAll(() => {
+    URL.createObjectURL = vi.fn(() => 'blob:prueba');
+    URL.revokeObjectURL = vi.fn();
+    globalThis.Image = class {
+        set src(_) { this.naturalWidth = 400; this.naturalHeight = 400; setTimeout(() => this.onload && this.onload(), 0); }
+    };
+});
+const subirFoto = async () => {
+    const archivo = new File([new Uint8Array(1000)], 'foto.png', { type: 'image/png' });
+    await userEvent.upload(screen.getByLabelText('Foto del producto'), archivo);
+    await screen.findByAltText('Vista previa del producto');
+};
 
 describe('Consultar productos (E1-HU3)', () => {
     it('muestra los productos del servidor', async () => {
@@ -63,11 +77,12 @@ describe('Registrar producto (E1-HU1)', () => {
         return f;
     };
     const boton = () => screen.getByRole('button', { name: /guardar producto/i });
-    const llenar = async ({ nombre = 'Papaya', precio = '4500', categoria = 'Frutas', stock = '12' } = {}) => {
+    const llenar = async ({ nombre = 'Papaya', precio = '4500', categoria = 'Frutas', stock = '12', foto = true } = {}) => {
         if (nombre) await userEvent.type(screen.getByLabelText('Nombre del Producto'), nombre);
         if (precio) await userEvent.type(screen.getByLabelText('Precio (COP)'), precio);
         if (categoria) await userEvent.selectOptions(screen.getByLabelText('Categoría'), categoria);
         if (stock) await userEvent.type(screen.getByLabelText('Stock disponible'), stock);
+        if (foto) await subirFoto();
     };
 
     it('E1-HU1 ESC3: formulario vacío → botón gris y deshabilitado', async () => {
@@ -80,6 +95,11 @@ describe('Registrar producto (E1-HU1)', () => {
         await llenar();
         expect(boton()).toBeEnabled();
         expect(boton()).not.toHaveClass('btn-primary-gris');
+    });
+    it('sin foto del producto → el botón sigue gris', async () => {
+        await montar();
+        await llenar({ foto: false });
+        expect(boton()).toBeDisabled();
     });
     it('nombre solo con espacios o precio 0 → el botón sigue gris', async () => {
         await montar();

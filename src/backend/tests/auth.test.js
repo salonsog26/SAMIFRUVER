@@ -63,3 +63,16 @@ describe('E2-HU2 Login de cliente (API)', () => {
         expect(r.body.usuario.password).toBeUndefined();
     });
 });
+
+describe('Contraseña del administrador en la base de datos', () => {
+    it('el administrador se valida contra la tabla administradores (con hash) y el correo no distingue mayúsculas', async () => {
+        const r = await env.api.post('/api/auth/login').send({ correo: 'ADMIN@SamiFruver.com', password: 'admin123' });
+        expect(r.status).toBe(200);
+        expect(r.body.usuario.rol).toBe('admin');
+        expect(env.leerTabla('administradores')[0].password_hash).toMatch(/^scrypt\$/);
+    });
+    it('un cliente no puede entrar como administrador aunque conozca la clave del admin', async () => {
+        const r = await env.api.post('/api/auth/login').send({ correo: 'ana@correo.com', password: 'admin123' });
+        expect(r.status).toBe(401);
+    });
+});

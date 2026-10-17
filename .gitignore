@@ -1,1 +1,21 @@
 node_modules/
+# Variables de entorno (contienen claves y la cadena de conexión a la base de datos)
+.env
+.env.*
+!.env.example
+ 
+# Dependencias y builds
+node_modules/
+dist/
+coverage/
+reports/
+ 
+# Logs
+*.log
+npm-debug.log*
+ 
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

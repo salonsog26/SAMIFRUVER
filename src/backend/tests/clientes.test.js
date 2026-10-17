@@ -13,19 +13,19 @@ describe('E2-HU1 Registro de cliente (API)', () => {
         expect(r.status).toBe(201);
         expect(r.body.mensaje).toBe('Registro exitoso');
         expect(r.body.cliente.password).toBeUndefined();
-        expect(env.leerArchivo('clientes.json')).toHaveLength(3);
+        expect(env.leerTabla('clientes')).toHaveLength(3);
     });
     it('E2-HU1 ESC1: correo ya registrado (aunque cambie mayúsculas) → 409 "El usuario ya existe"', async () => {
         const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, correo: 'ANA@correo.com' });
         expect(r.status).toBe(409);
         expect(r.body.errores.correo).toBe('El usuario ya existe');
-        expect(env.leerArchivo('clientes.json')).toHaveLength(2);
+        expect(env.leerTabla('clientes')).toHaveLength(2);
     });
     it('E2-HU1 ESC3 (CP tester): contraseña de solo espacios → "Este campo es obligatorio" y no crea el cliente', async () => {
         const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, password: '     ' });
         expect(r.status).toBe(400);
         expect(r.body.errores.password).toBe('Este campo es obligatorio');
-        expect(env.leerArchivo('clientes.json')).toHaveLength(2);
+        expect(env.leerTabla('clientes')).toHaveLength(2);
     });
     it('E2-HU1 ESC3 (CP tester): todos los campos con solo espacios → obligatorio en los 4', async () => {
         const r = await env.api.post('/api/clientes/registro').send({ nombre: '   ', correo: '   ', telefono: '   ', password: '   ' });
@@ -34,7 +34,9 @@ describe('E2-HU1 Registro de cliente (API)', () => {
     });
     it('contraseña con espacios en los extremos: se guarda recortada y permite iniciar sesión', async () => {
         await env.api.post('/api/clientes/registro').send({ ...nuevo, password: '  abcd1234  ' });
-        expect(env.leerArchivo('clientes.json')[2].password).toBe('abcd1234');
+        const guardada = env.leerTabla('clientes')[2].password_hash;
+        expect(guardada).toMatch(/^scrypt\$/);
+        expect(guardada).not.toContain('abcd1234');
         const l = await env.api.post('/api/auth/login').send({ correo: nuevo.correo, password: '  abcd1234  ' });
         expect(l.status).toBe(200);
     });
@@ -79,7 +81,7 @@ describe('E2-HU1 Registro de cliente (API)', () => {
     });
     it('E2-HU1: el correo se guarda en minúsculas y sin espacios', async () => {
         await env.api.post('/api/clientes/registro').send({ ...nuevo, correo: '  Maria@Correo.com ' });
-        expect(env.leerArchivo('clientes.json')[2].correo).toBe('maria@correo.com');
+        expect(env.leerTabla('clientes')[2].correo).toBe('maria@correo.com');
     });
 });
 
@@ -90,12 +92,22 @@ describe('E2-HU3 Editar perfil (API)', () => {
         expect(r.status).toBe(200);
         expect(r.body.mensaje).toBe('Cambios guardados correctamente');
         expect(r.body.cambios).toBe(true);
-        expect(env.leerArchivo('clientes.json')[0].nombre).toBe('Ana María Pérez');
+        expect(env.leerTabla('clientes')[0].nombre).toBe('Ana María Pérez');
     });
     it('E2-HU3: la contraseña no cambia ni se devuelve', async () => {
         const r = await env.api.put('/api/clientes/1').send(cambio);
         expect(r.body.cliente.password).toBeUndefined();
-        expect(env.leerArchivo('clientes.json')[0].password).toBe('clave1234');
+        const hashAntes = env.leerTabla('clientes')[0].password_hash;
+        expect(env.leerTabla('clientes')[0].password_hash).toBe(hashAntes);
+        const l = await env.api.post('/api/auth/login').send({ correo: 'ana@correo.com', password: 'clave1234' });
+        expect(l.status).toBe(200);
+    });
+    it('E2-HU1: la contraseña se guarda cifrada (nunca en texto plano) y dos clientes con la misma clave tienen hashes distintos', async () => {
+        await env.api.post('/api/clientes/registro').send(nuevo);
+        await env.api.post('/api/clientes/registro').send({ ...nuevo, correo: 'otra@correo.com' });
+        const filas = env.leerTabla('clientes');
+        expect(filas[2].password_hash).not.toBe(filas[3].password_hash);
+        expect(filas.every((f) => f.password_hash.startsWith('scrypt$'))).toBe(true);
     });
     it('E2-HU3 ESC4: guardar sin cambios → "No se ha realizado ningún cambio"', async () => {
         const r = await env.api.put('/api/clientes/1').send({ nombre: 'Ana Pérez', correo: 'ana@correo.com', telefono: '3001234567' });
@@ -111,7 +123,7 @@ describe('E2-HU3 Editar perfil (API)', () => {
     it('E2-HU3 ESC2: correo de otro usuario → 409 y no modifica', async () => {
         const r = await env.api.put('/api/clientes/1').send({ ...cambio, correo: 'luis@correo.com' });
         expect(r.status).toBe(409);
-        expect(env.leerArchivo('clientes.json')[0].correo).toBe('ana@correo.com');
+        expect(env.leerTabla('clientes')[0].correo).toBe('ana@correo.com');
     });
     it('E2-HU3 ESC2b: el mensaje de correo ajeno es el del diseño', async () => {
         const r = await env.api.put('/api/clientes/1').send({ ...cambio, correo: 'luis@correo.com' });

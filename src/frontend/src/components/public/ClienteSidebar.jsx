@@ -1,10 +1,12 @@
 // src/components/public/ClienteSidebar.jsx — menú lateral del área "Mi cuenta" (cliente)
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Package, MapPin, Heart, LogOut } from 'lucide-react';
+import { User, Package, MapPin, Heart, LogOut, X } from 'lucide-react';
 import logo from '../../assets/logo-samifruver.png';
 import { obtenerSesion, cerrarSesion } from '../../utils/auth';
 import { iniciales } from './Navbar';
+import useMenuLateral from '../../utils/useMenuLateral';
+import BarraMovil from '../admin/BarraMovil';
 import '../../styles/variables.css';
 
 // "Mis pedidos", "Direcciones" y "Favoritos" aparecen en el diseño pero aún no tienen pantalla.
@@ -17,6 +19,7 @@ const OPCIONES_PROXIMAMENTE = [
 function ClienteSidebar({ nombre }) {
     const navigate = useNavigate();
     const sesion = obtenerSesion();
+    const { abierto, abrir, cerrar } = useMenuLateral();
     const nombreMostrado = nombre || sesion?.nombre || 'Cliente';
 
     const salir = () => {
@@ -25,10 +28,16 @@ function ClienteSidebar({ nombre }) {
     };
 
     return (
-        <aside className="sidebar">
+        <>
+        <BarraMovil abierto={abierto} onAbrir={abrir} />
+        {abierto && <div className="sidebar-backdrop" onClick={cerrar} />}
+        <aside className={`sidebar${abierto ? ' abierto' : ''}`}>
             <div className="sidebar-top">
                 <div className="sidebar-logo-container">
                     <img src={logo} alt="Samifruver" style={{ height: 36, width: 'auto' }} />
+                    <button type="button" className="sidebar-cerrar" aria-label="Cerrar menú" onClick={cerrar}>
+                        <X size={20} />
+                    </button>
                 </div>
 
                 <nav className="sidebar-menu">
@@ -59,6 +68,7 @@ function ClienteSidebar({ nombre }) {
                 </button>
             </div>
         </aside>
+        </>
     );
 }
 
