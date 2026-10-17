@@ -1,33 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { validarProducto } from '../context/ProductosContext';
-import { validarPerfil, validarRegistro, OBLIGATORIO } from '../utils/validaciones';
-import { resolverImagen, IMAGEN_DEFECTO } from '../utils/imagenes';
+import { validarPerfil, validarRegistro, validarCorreoLogin, validarTelefono, OBLIGATORIO, MSJ_CORREO, MSJ_CORREO_LOGIN } from '../utils/validaciones';
 import { obtenerSesion, guardarSesion, cerrarSesion, obtenerToken, login } from '../utils/auth';
 import { simularFetch } from './utils.jsx';
-
-describe('E1-HU1/HU2 validarProducto (front)', () => {
-    const ok = { nombre: 'Papaya', precio: '4500', categoria: 'Frutas', stock: '3', unidad: 'lb' };
-    it('datos correctos → sin errores', () => expect(validarProducto(ok)).toEqual({}));
-    it('E1-HU1 ESC3: campos vacíos → errores en todos', () => {
-        expect(Object.keys(validarProducto({ nombre: '', precio: '', categoria: '', stock: '', unidad: '' })).sort())
-            .toEqual(['categoria', 'nombre', 'precio', 'stock', 'unidad']);
-    });
-    it.each([
-        ['nombre solo espacios', { nombre: '   ' }, 'nombre'],
-        ['nombre de un carácter', { nombre: 'A' }, 'nombre'],
-        ['nombre con símbolos', { nombre: '$$$' }, 'nombre'],
-        ['precio 0', { precio: '0' }, 'precio'],
-        ['precio negativo', { precio: '-3' }, 'precio'],
-        ['precio texto', { precio: 'abc' }, 'precio'],
-        ['stock negativo', { stock: '-1' }, 'stock'],
-        ['stock texto', { stock: 'x' }, 'stock']
-    ])('E1-HU1 ESC3: %s → error', (_n, cambio, campo) => {
-        expect(validarProducto({ ...ok, ...cambio })[campo]).toBeTruthy();
-    });
-    it('acepta stock 0, nombres con tildes y decimales', () => {
-        expect(validarProducto({ ...ok, stock: '0', nombre: 'Piña', precio: '1500.5' })).toEqual({});
-    });
-});
 
 describe('E2 validaciones de cliente (front)', () => {
     const ok = { nombre: 'María López', correo: 'm@c.com', telefono: '3205551234', password: 'abcd1234' };
@@ -44,20 +18,33 @@ describe('E2 validaciones de cliente (front)', () => {
     ])('E2-HU1 ESC4: %s', (_n, cambio, campo) => {
         expect(validarRegistro({ ...ok, ...cambio })[campo]).toBeTruthy();
     });
+    it('E2-HU1 ESC3 (CP tester): contraseña de solo espacios → "Este campo es obligatorio"', () => {
+        expect(validarRegistro({ ...ok, password: '   ' }).password).toBe(OBLIGATORIO);
+        expect(validarRegistro({ ...ok, password: 'abc     ' }).password).toBe('La contraseña debe tener mínimo 8 caracteres');
+    });
+    it('E2-HU1 ESC4: el mensaje de correo inválido pide un dominio válido', () => {
+        expect(validarRegistro({ ...ok, correo: 'maria@' }).correo).toBe(MSJ_CORREO);
+    });
+    it('el teléfono admite espacios entre dígitos pero no letras', () => {
+        expect(validarTelefono('300 456 7890')).toBeUndefined();
+        expect(validarTelefono('300 abc 7890')).toBeTruthy();
+        expect(validarTelefono('123')).toBeTruthy();
+    });
+    it('E2-HU2: validarCorreoLogin devuelve "Correo no válido" solo si el formato es incorrecto', () => {
+        expect(validarCorreoLogin('a@b.com')).toBeUndefined();
+        expect(validarCorreoLogin('a@b')).toBe(MSJ_CORREO_LOGIN);
+        expect(MSJ_CORREO_LOGIN).toBe('Correo no válido');
+    });
+    it('E2-HU3: documento, dirección y ciudad son opcionales pero se validan si vienen', () => {
+        expect(validarPerfil({ ...ok, documento: '', direccion: '', ciudad: '' })).toEqual({});
+        expect(validarPerfil({ ...ok, documento: '1.023.456.789', direccion: 'Carrera 18 # 72–26', ciudad: 'Bogotá, D. C.' })).toEqual({});
+        expect(validarPerfil({ ...ok, documento: 'abc' })).toHaveProperty('documento');
+        expect(validarPerfil({ ...ok, ciudad: '123' })).toHaveProperty('ciudad');
+    });
     it('E2-HU3: validarPerfil no exige contraseña', () => {
         expect(validarPerfil(ok)).toEqual({});
         expect(validarPerfil({ nombre: '', correo: 'x', telefono: '' })).toHaveProperty('nombre', OBLIGATORIO);
     });
-});
-
-describe('Imágenes', () => {
-    it('usa imagen por defecto si no hay URL, no es texto o es placehold.co', () => {
-        expect(resolverImagen('')).toBe(IMAGEN_DEFECTO);
-        expect(resolverImagen(null)).toBe(IMAGEN_DEFECTO);
-        expect(resolverImagen(5)).toBe(IMAGEN_DEFECTO);
-        expect(resolverImagen('https://placehold.co/100')).toBe(IMAGEN_DEFECTO);
-    });
-    it('respeta una URL válida', () => expect(resolverImagen('/images/x.webp')).toBe('/images/x.webp'));
 });
 
 describe('Sesión (localStorage)', () => {

@@ -1,18 +1,15 @@
 // src/components/public/Navbar.jsx
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { obtenerSesion, cerrarSesion } from '../../utils/auth';
+import { Link } from 'react-router-dom';
+import { obtenerSesion } from '../../utils/auth';
 import logo from '../../assets/logo-samifruver.png';
 import '../../styles/variables.css';
 
-function Navbar({ cartCount = 0 }) {
-    const navigate = useNavigate();
-    const sesion = obtenerSesion();
+export const iniciales = (texto = '') =>
+    String(texto).split('@')[0].split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('').toUpperCase() || 'US';
 
-    const salir = () => {
-        cerrarSesion();
-        navigate('/login');
-    };
+function Navbar({ cartCount = 0 }) {
+    const sesion = obtenerSesion();
 
     return (
         <header className="public-navbar">
@@ -40,17 +37,15 @@ function Navbar({ cartCount = 0 }) {
                         <Link to="/registro" className="btn-primary-nav">Registrarse</Link>
                     </>
                 )}
-                {sesion?.rol === 'cliente' && (
-                    <>
-                        <Link to="/perfil" className="btn-outline">Hola, {(sesion.nombre || 'cliente').split(' ')[0]}</Link>
-                        <button type="button" className="btn-primary-nav" onClick={salir}>Cerrar sesión</button>
-                    </>
-                )}
-                {sesion?.rol === 'admin' && (
-                    <>
-                        <Link to="/admin/productos" className="btn-outline">Panel admin</Link>
-                        <button type="button" className="btn-primary-nav" onClick={salir}>Cerrar sesión</button>
-                    </>
+                {sesion && (
+                    <Link
+                        to={sesion.rol === 'admin' ? '/admin/productos' : '/perfil'}
+                        className="public-navbar-user"
+                        aria-label={sesion.rol === 'admin' ? 'Ir al panel de administrador' : 'Ir a mi perfil'}
+                    >
+                        <span className="public-navbar-user-name">{(sesion.nombre || 'Usuario').split(' ')[0]}</span>
+                        <span className="public-navbar-avatar">{iniciales(sesion.nombre || sesion.correo)}</span>
+                    </Link>
                 )}
             </div>
         </header>

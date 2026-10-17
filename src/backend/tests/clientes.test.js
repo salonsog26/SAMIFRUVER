@@ -15,11 +15,32 @@ describe('E2-HU1 Registro de cliente (API)', () => {
         expect(r.body.cliente.password).toBeUndefined();
         expect(env.leerArchivo('clientes.json')).toHaveLength(3);
     });
-    it('E2-HU1 ESC1: correo ya registrado (aunque cambie mayúsculas) → 409 "usuario ya existe"', async () => {
+    it('E2-HU1 ESC1: correo ya registrado (aunque cambie mayúsculas) → 409 "El usuario ya existe"', async () => {
         const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, correo: 'ANA@correo.com' });
         expect(r.status).toBe(409);
-        expect(r.body.errores.correo).toBe('usuario ya existe');
+        expect(r.body.errores.correo).toBe('El usuario ya existe');
         expect(env.leerArchivo('clientes.json')).toHaveLength(2);
+    });
+    it('E2-HU1 ESC3 (CP tester): contraseña de solo espacios → "Este campo es obligatorio" y no crea el cliente', async () => {
+        const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, password: '     ' });
+        expect(r.status).toBe(400);
+        expect(r.body.errores.password).toBe('Este campo es obligatorio');
+        expect(env.leerArchivo('clientes.json')).toHaveLength(2);
+    });
+    it('E2-HU1 ESC3 (CP tester): todos los campos con solo espacios → obligatorio en los 4', async () => {
+        const r = await env.api.post('/api/clientes/registro').send({ nombre: '   ', correo: '   ', telefono: '   ', password: '   ' });
+        expect(r.status).toBe(400);
+        expect(Object.values(r.body.errores)).toEqual(Array(4).fill('Este campo es obligatorio'));
+    });
+    it('contraseña con espacios en los extremos: se guarda recortada y permite iniciar sesión', async () => {
+        await env.api.post('/api/clientes/registro').send({ ...nuevo, password: '  abcd1234  ' });
+        expect(env.leerArchivo('clientes.json')[2].password).toBe('abcd1234');
+        const l = await env.api.post('/api/auth/login').send({ correo: nuevo.correo, password: '  abcd1234  ' });
+        expect(l.status).toBe(200);
+    });
+    it('contraseña de 3 letras + espacios hasta 8 caracteres sigue siendo demasiado corta', async () => {
+        const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, password: 'abc     ' });
+        expect(r.body.errores.password).toBe('La contraseña debe tener mínimo 8 caracteres');
     });
     it('E2-HU1 ESC3: campos vacíos → 400 "Este campo es obligatorio" en cada campo', async () => {
         const r = await env.api.post('/api/clientes/registro').send({ nombre: '', correo: '', telefono: '', password: '' });
@@ -46,6 +67,15 @@ describe('E2-HU1 Registro de cliente (API)', () => {
     it('E2-HU1 ESC4b: tipos no válidos (números/objetos) no rompen el servidor', async () => {
         const r = await env.api.post('/api/clientes/registro').send({ nombre: 1, correo: {}, telefono: 3, password: [] });
         expect(r.status).toBe(400);
+    });
+    it('E2-HU1 ESC4c: correo sin dominio → "El correo debe incluir un dominio válido, por ejemplo: nombre@dominio.com"', async () => {
+        const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, correo: 'maria.gomez@correo' });
+        expect(r.body.errores.correo).toBe('El correo debe incluir un dominio válido, por ejemplo: nombre@dominio.com');
+    });
+    it('E2-HU1: acepta teléfono con espacios (300 456 7890) y lo guarda ordenado', async () => {
+        const r = await env.api.post('/api/clientes/registro').send({ ...nuevo, telefono: '  300   456 7890 ' });
+        expect(r.status).toBe(201);
+        expect(r.body.cliente.telefono).toBe('300 456 7890');
     });
     it('E2-HU1: el correo se guarda en minúsculas y sin espacios', async () => {
         await env.api.post('/api/clientes/registro').send({ ...nuevo, correo: '  Maria@Correo.com ' });
@@ -82,6 +112,33 @@ describe('E2-HU3 Editar perfil (API)', () => {
         const r = await env.api.put('/api/clientes/1').send({ ...cambio, correo: 'luis@correo.com' });
         expect(r.status).toBe(409);
         expect(env.leerArchivo('clientes.json')[0].correo).toBe('ana@correo.com');
+    });
+    it('E2-HU3 ESC2b: el mensaje de correo ajeno es el del diseño', async () => {
+        const r = await env.api.put('/api/clientes/1').send({ ...cambio, correo: 'luis@correo.com' });
+        expect(r.body.mensaje).toBe('El correo le pertenece a otro cliente ya existe');
+    });
+    it('E2-HU3: guarda documento, dirección y ciudad (opcionales) y los devuelve', async () => {
+        const r = await env.api.put('/api/clientes/1').send({ ...cambio, documento: '1.023.456.789', direccion: 'Carrera 18 # 72–26', ciudad: 'Bogotá, D. C.' });
+        expect(r.status).toBe(200);
+        expect(r.body.cliente).toMatchObject({ documento: '1.023.456.789', direccion: 'Carrera 18 # 72–26', ciudad: 'Bogotá, D. C.' });
+        expect((await env.api.get('/api/clientes/1')).body.cliente.ciudad).toBe('Bogotá, D. C.');
+    });
+    it('E2-HU3: los campos opcionales pueden quedar vacíos, y si no vienen se conservan', async () => {
+        await env.api.put('/api/clientes/1').send({ ...cambio, ciudad: 'Popayán' });
+        const r = await env.api.put('/api/clientes/1').send({ ...cambio, telefono: '3009998877' });
+        expect(r.body.cliente.ciudad).toBe('Popayán');
+        const vacio = await env.api.put('/api/clientes/1').send({ ...cambio, telefono: '3009998877', ciudad: '' });
+        expect(vacio.body.cliente.ciudad).toBe('');
+    });
+    it.each([
+        ['documento con letras', { documento: 'ABC123' }, 'documento'],
+        ['ciudad con números', { ciudad: 'B0gota99' }, 'ciudad'],
+        ['dirección demasiado larga', { direccion: 'x'.repeat(121) }, 'direccion'],
+        ['documento no es texto', { documento: { a: 1 } }, 'documento']
+    ])('E2-HU3: campo opcional inválido (%s) → 400', async (_n, extra, campo) => {
+        const r = await env.api.put('/api/clientes/1').send({ ...cambio, ...extra });
+        expect(r.status).toBe(400);
+        expect(r.body.errores[campo]).toBeTruthy();
     });
     it('E2-HU3: cliente inexistente → 404', async () => {
         expect((await env.api.put('/api/clientes/99').send(cambio)).status).toBe(404);

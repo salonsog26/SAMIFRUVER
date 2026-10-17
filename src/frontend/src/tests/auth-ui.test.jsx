@@ -6,6 +6,7 @@ import Login from '../pages/public/Login';
 import Registro from '../pages/public/Registro';
 import RutaProtegida from '../routes/RutaProtegida';
 import { obtenerSesion } from '../utils/auth';
+import { MSJ_CORREO } from '../utils/validaciones';
 import { renderEnRutas, simularFetch, llamadasA, ponerSesion, SESION_ADMIN, SESION_CLIENTE } from './utils.jsx';
 
 const rutaActual = () => screen.getByTestId('ruta-actual').textContent;
@@ -45,7 +46,7 @@ describe('Login (E1-HU4 administrador y E2-HU2 cliente)', () => {
         { path: '/', element: <div>pantalla-principal</div> },
         { path: '/admin/productos', element: <div>panel-admin</div> }
     ], '/login');
-    const campos = () => ({ correo: screen.getByLabelText(/correo/i), pass: screen.getByLabelText(/contraseña/i), boton: screen.getByRole('button', { name: /ingresar/i }) });
+    const campos = () => ({ correo: screen.getByLabelText('Correo electrónico'), pass: screen.getByLabelText('Contraseña'), boton: screen.getByRole('button', { name: /ingresar/i }) });
 
     it('E1-HU4 ESC3 / E2-HU2 ESC3: sin datos → botón deshabilitado', () => {
         montar();
@@ -91,14 +92,30 @@ describe('Login (E1-HU4 administrador y E2-HU2 cliente)', () => {
         expect(rutaActual()).toBe('/login');
         expect(obtenerSesion()).toBeNull();
     });
-    it('E1-HU4 ESC4: correo con formato inválido → no inicia sesión y muestra el mensaje genérico', async () => {
-        simularFetch({ 'POST /api/auth/login': { status: 401, json: { success: false, mensaje: INCORRECTO } } });
+    it('E1-HU4 ESC4 / E2-HU2: correo con formato inválido → "Correo no válido" y no llama al servidor', async () => {
+        const f = simularFetch({});
         montar();
         await userEvent.type(campos().correo, 'esto-no-es-un-correo');
         await userEvent.type(campos().pass, 'admin123');
         await userEvent.click(campos().boton);
-        expect(await screen.findByText(INCORRECTO)).toBeInTheDocument();
+        expect(await screen.findByText('Correo no válido')).toBeInTheDocument();
+        expect(f).not.toHaveBeenCalled();
         expect(obtenerSesion()).toBeNull();
+    });
+    it('E2-HU2: el botón "Ingresar" pasa de gris (deshabilitado) a verde (habilitado) al llenar el formulario', async () => {
+        montar();
+        expect(campos().boton).toBeDisabled();
+        await userEvent.type(campos().correo, 'a@b.com');
+        await userEvent.type(campos().pass, 'x');
+        expect(campos().boton).toBeEnabled();
+    });
+    it('E2-HU2: el ojo muestra y oculta la contraseña', async () => {
+        montar();
+        expect(campos().pass).toHaveAttribute('type', 'password');
+        await userEvent.click(screen.getByRole('button', { name: 'Mostrar contraseña' }));
+        expect(campos().pass).toHaveAttribute('type', 'text');
+        await userEvent.click(screen.getByRole('button', { name: 'Ocultar contraseña' }));
+        expect(campos().pass).toHaveAttribute('type', 'password');
     });
     it('corregir un campo borra el mensaje de error', async () => {
         simularFetch({ 'POST /api/auth/login': { status: 401, json: { success: false, mensaje: INCORRECTO } } });
@@ -148,12 +165,28 @@ describe('Registro de cliente (E2-HU1)', () => {
         expect(await screen.findAllByText('Este campo es obligatorio')).toHaveLength(4);
         expect(f).not.toHaveBeenCalled();
     });
+    it('E2-HU1 ESC3 (CP tester): todos los campos con solo espacios → obligatorio en los 4 (incluida la contraseña) y no envía', async () => {
+        const f = simularFetch({});
+        montar();
+        await llenar({ nombre: '   ', correo: '   ', telefono: '   ', password: '   ' });
+        await enviar();
+        expect(await screen.findAllByText('Este campo es obligatorio')).toHaveLength(4);
+        expect(f).not.toHaveBeenCalled();
+    });
+    it('E2-HU1 ESC3 (CP tester): solo la contraseña con espacios → "Este campo es obligatorio" en la contraseña', async () => {
+        const f = simularFetch({});
+        montar();
+        await llenar({ password: '   ' });
+        await enviar();
+        expect(await screen.findAllByText('Este campo es obligatorio')).toHaveLength(1);
+        expect(f).not.toHaveBeenCalled();
+    });
     it('E2-HU1 ESC4: correo inválido → mensaje y no envía', async () => {
         const f = simularFetch({});
         montar();
         await llenar({ correo: 'maria.correo.com' });
         await enviar();
-        expect(await screen.findByText('Ingresa un correo electrónico válido')).toBeInTheDocument();
+        expect(await screen.findByText(MSJ_CORREO)).toBeInTheDocument();
         expect(f).not.toHaveBeenCalled();
     });
     it('E2-HU1 ESC4: contraseña de menos de 8 caracteres y teléfono con letras', async () => {
@@ -164,12 +197,12 @@ describe('Registro de cliente (E2-HU1)', () => {
         expect(await screen.findByText('La contraseña debe tener mínimo 8 caracteres')).toBeInTheDocument();
         expect(screen.getByText('Ingresa un teléfono válido')).toBeInTheDocument();
     });
-    it('E2-HU1 ESC1: usuario ya registrado → "usuario ya existe"', async () => {
-        simularFetch({ 'POST /api/clientes/registro': { status: 409, json: { mensaje: 'usuario ya existe', errores: { correo: 'usuario ya existe' } } } });
+    it('E2-HU1 ESC1: usuario ya registrado → "El usuario ya existe"', async () => {
+        simularFetch({ 'POST /api/clientes/registro': { status: 409, json: { mensaje: 'El usuario ya existe', errores: { correo: 'El usuario ya existe' } } } });
         montar();
         await llenar();
         await enviar();
-        expect((await screen.findAllByText('usuario ya existe')).length).toBeGreaterThan(0);
+        expect(await screen.findByText('El usuario ya existe')).toBeInTheDocument();
         expect(screen.queryByText('pantalla-login')).not.toBeInTheDocument();
     });
     it('E2-HU1 ESC2: registro exitoso → "Registro exitoso" y luego va a /login', async () => {
@@ -180,6 +213,27 @@ describe('Registro de cliente (E2-HU1)', () => {
         expect(await screen.findByText('Registro exitoso')).toBeInTheDocument();
         expect(llamadasA(f, 'POST /api/clientes/registro')).toHaveLength(1);
         await waitFor(() => expect(rutaActual()).toBe('/login'), { timeout: 3000 });
+    });
+    it('E2-HU1: los campos muestran su texto de ayuda (placeholder) y no hay línea "Mínimo 8 caracteres"', () => {
+        montar();
+        expect(screen.getByPlaceholderText('nombre@correo.com')).toBeInTheDocument();
+        expect(screen.queryByText('Mínimo 8 caracteres')).not.toBeInTheDocument();
+        expect(screen.getByText('Crea tu cuenta en SAMIFRUVER')).toBeInTheDocument();
+    });
+    it('E2-HU1: el ojo muestra y oculta la contraseña', async () => {
+        montar();
+        const pass = screen.getByLabelText('Contraseña');
+        expect(pass).toHaveAttribute('type', 'password');
+        await userEvent.click(screen.getByRole('button', { name: 'Mostrar contraseña' }));
+        expect(pass).toHaveAttribute('type', 'text');
+    });
+    it('E2-HU1: el teléfono acepta espacios ("300 456 7890") y se envía al servidor', async () => {
+        const f = simularFetch({ 'POST /api/clientes/registro': { status: 201, json: { mensaje: 'Registro exitoso', cliente: { id: 3 } } } });
+        montar();
+        await llenar({ telefono: '300 456 7890' });
+        await enviar();
+        expect(await screen.findByText('Registro exitoso')).toBeInTheDocument();
+        expect(JSON.parse(llamadasA(f, 'POST /api/clientes/registro')[0][1].body).telefono).toBe('300 456 7890');
     });
     it('servidor caído → mensaje de conexión', async () => {
         simularFetch({});

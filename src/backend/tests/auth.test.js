@@ -18,6 +18,10 @@ describe('E1-HU4 Login de administrador (API)', () => {
         expect(r.body.token).toBeTruthy();
         expect(r.body.usuario.rol).toBe('admin');
     });
+    it('E1-HU4 ESC2c: acepta el correo admin@samifruver.com (y el anterior admin@samifruber.com)', async () => {
+        expect((await env.api.post('/api/auth/login').send({ correo: 'admin@samifruver.com', password: 'admin123' })).status).toBe(200);
+        expect((await env.api.post('/api/auth/login').send({ correo: 'admin@samifruber.com', password: 'admin123' })).status).toBe(200);
+    });
     it('E1-HU4 ESC2b: ignora espacios y mayúsculas en el correo', async () => {
         const r = await env.api.post('/api/auth/login').send({ correo: '  ADMIN@samifruber.com ', password: ' admin123 ' });
         expect(r.status).toBe(200);

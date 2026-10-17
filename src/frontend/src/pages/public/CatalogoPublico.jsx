@@ -5,6 +5,7 @@ import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import ProductCard from '../../components/public/ProductCard';
 import bannerCatalogo from '../../assets/banner-catalogo.webp';
+import { API_URL } from '../../utils/config';
 import { resolverImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
 
