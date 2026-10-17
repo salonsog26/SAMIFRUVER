@@ -1,24 +1,25 @@
 import React from 'react';
+import { CircleCheck, CircleAlert, TriangleAlert } from 'lucide-react';
 import '../../styles/variables.css';
 
-function Alert({ tipo, mensaje }) {
-    // Ahora manejamos los 3 estados
+// Aviso flotante (toast). tipo: 'exito' | 'error' | 'advertencia'. className opcional para ubicarlo.
+function Alert({ tipo, mensaje, className = '' }) {
     let alertClass = '';
-    let icono = '';
+    let icono = null;
 
     if (tipo === 'exito') {
         alertClass = 'alert-success';
-        icono = '✔️';
+        icono = <CircleCheck size={20} />;
     } else if (tipo === 'error') {
         alertClass = 'alert-error';
-        icono = '❌';
+        icono = <CircleAlert size={20} />;
     } else if (tipo === 'advertencia') {
         alertClass = 'alert-warning';
-        icono = '⚠️';
+        icono = <TriangleAlert size={20} />;
     }
 
     return (
-        <div className={`alert-toast ${alertClass}`}>
+        <div className={`alert-toast ${alertClass} ${className}`.trim()} role={tipo === 'error' ? 'alert' : 'status'}>
             <div className="alert-icon-placeholder">{icono}</div>
             <span style={{ fontSize: 14, fontWeight: 600 }}>{mensaje}</span>
         </div>

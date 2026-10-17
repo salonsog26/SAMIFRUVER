@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import CatalogoPublico from '../pages/public/CatalogoPublico';
 import Login from '../pages/public/Login';
 import Registro from '../pages/public/Registro';
+import Perfil from '../pages/public/Perfil';
 
 import ConsultarProductos from '../pages/admin/ConsultarProductos';
 import RegistrarProducto from '../pages/admin/RegistrarProducto';
@@ -19,7 +20,9 @@ function AppRouter() {
                 <Route path="/" element={<CatalogoPublico />} />
 
                 <Route path="/login" element={<Login />} />
-                <Route path="/registro" element={<Registskro />} />
+                <Route path="/registro" element={<Registro />} />
+
+                <Route path="/perfil" element={<RutaProtegida rolRequerido="cliente"><Perfil /></RutaProtegida>} />
 
                 <Route path="/admin/dashboard" element={<Navigate to="/admin/productos" replace />} />
                 <Route path="/admin/productos" element={<RutaProtegida rolRequerido="admin"><ConsultarProductos /></RutaProtegida>} />

@@ -4,10 +4,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import AuthHeroBanner from '../../components/public/AuthHeroBanner';
 import PublicNavbar from '../../components/public/PublicNavbar';
 import AuthInput from '../../components/forms/AuthInput';
-import { guardarSesion } from '../../utils/auth';
+import { login, MSJ_LOGIN_INCORRECTO } from '../../utils/auth';
+import { validarCorreoLogin } from '../../utils/validaciones';
 import '../../styles/variables.css';
 
-const API_URL = 'http://localhost:4000';
 
 function Login() {
     const navigate = useNavigate();
@@ -15,12 +15,14 @@ function Login() {
     const [contrasena, setContrasena] = useState('');
     const [credencialesInvalidas, setCredencialesInvalidas] = useState(false);
     const [errorGeneral, setErrorGeneral] = useState('');
+    const [errorCorreo, setErrorCorreo] = useState('');
     const [cargando, setCargando] = useState(false);
 
     const botonDeshabilitado = !correo.trim() || !contrasena.trim() || cargando;
 
     const manejarCambioCorreo = (e) => {
         setCorreo(e.target.value);
+        setErrorCorreo('');
         setCredencialesInvalidas(false);
         setErrorGeneral('');
     };
@@ -35,43 +37,28 @@ function Login() {
         e.preventDefault();
         if (botonDeshabilitado) return;
 
+        const formatoCorreo = validarCorreoLogin(correo);
+        if (formatoCorreo) { // correo con formato inválido: no se envía
+            setErrorCorreo(formatoCorreo);
+            return;
+        }
+
         setCargando(true);
         setErrorGeneral('');
         setCredencialesInvalidas(false);
 
-        try {
-            const respCliente = await fetch(`${API_URL}/api/clientes/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ correo, password: contrasena }),
-            });
-            const dataCliente = await respCliente.json();
+        const resultado = await login(correo, contrasena);
+        setCargando(false);
 
-            if (respCliente.ok) {
-                guardarSesion({ ...dataCliente.cliente, rol: 'cliente' });
-                navigate('/');
-                return;
-            }
-
-            const respAdmin = await fetch(`${API_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ correo, password: contrasena }),
-            });
-            const dataAdmin = await respAdmin.json();
-
-            if (respAdmin.ok) {
-                guardarSesion({ correo: dataAdmin.usuario.correo, nombre: 'Administrador', rol: 'admin' });
-                navigate('/admin/productos');
-                return;
-            }
-
+        if (resultado.ok) {
+            navigate(resultado.usuario.rol === 'admin' ? '/admin/productos' : '/');
+            return;
+        }
+        if (resultado.red) {
+            setErrorGeneral(resultado.mensaje);
+        } else {
             setCredencialesInvalidas(true);
-            setErrorGeneral('La información de inicio de sesión que ingresaste es incorrecta.');
-        } catch (error) {
-            setErrorGeneral('No se pudo conectar con el servidor. Intenta de nuevo.');
-        } finally {
-            setCargando(false);
+            setErrorGeneral(MSJ_LOGIN_INCORRECTO);
         }
     };
 
@@ -84,13 +71,13 @@ function Login() {
 
                 <div style={{ width: '100%', maxWidth: 500, display: 'flex', flexDirection: 'column', gap: 24 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        <h2 style={{ color: '#10271B', fontSize: 36, fontFamily: 'Inter', margin: 0 }}>Bienvenido de nuevo</h2>
+                        <h2 className="auth-titulo">Bienvenido de nuevo</h2>
                         <p style={{ color: '#68786F', fontSize: 16, fontFamily: 'Inter', margin: 0 }}>Ingresa tus datos para continuar comprando productos frescos.</p>
                     </div>
 
-                    <form onSubmit={manejarSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18, width: '100%' }}>
-                        <AuthInput label="Correo electrónico" type="email" value={correo} onChange={manejarCambioCorreo} error={credencialesInvalidas} />
-                        <AuthInput label="Contraseña" type="password" value={contrasena} onChange={manejarCambioContrasena} error={credencialesInvalidas} />
+                    <form noValidate onSubmit={manejarSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18, width: '100%' }}>
+                        <AuthInput label="Correo electrónico" type="email" placeholder="nombre@correo.com" value={correo} onChange={manejarCambioCorreo} error={errorCorreo || credencialesInvalidas} autoComplete="email" />
+                        <AuthInput label="Contraseña" type="password" value={contrasena} onChange={manejarCambioContrasena} error={credencialesInvalidas} autoComplete="current-password" />
 
                         {errorGeneral && (
                             <p style={{ color: '#D92D20', fontSize: 14, fontFamily: 'Inter', margin: 0 }}>{errorGeneral}</p>

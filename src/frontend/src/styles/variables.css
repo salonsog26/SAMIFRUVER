@@ -20,6 +20,7 @@ body,
 
 body {
     overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
 }
 
 /* --- LAYOUT GENERAL ADMINISTRADOR --- */
@@ -1208,4 +1209,269 @@ body {
     color: #10271B;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   ÉPICA 2 — Ajustes según mockups (registro, login, perfil)
+   ============================================================ */
+.auth-titulo {
+    color: #10271B;
+    font-size: 36px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    margin: 0;
+}
+
+.auth-enlace-suave {
+    color: #68786F;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-enlace-suave:hover {
+    color: #20A34A;
+    text-decoration: underline;
+}
+
+.input-eye-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    background: transparent;
+    border: none;
+    color: #68786F;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.input-eye-btn:hover {
+    color: #10271B;
+}
+
+.inline-alert-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    align-self: flex-start;
+    padding: 14px 18px;
+    background-color: #FFF1F0;
+    border: 1.5px solid #D92D20;
+    border-radius: 12px;
+    color: #D92D20;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0px 4px 12px rgba(217, 45, 32, 0.12);
+}
+
+/* Modal de advertencia (salir sin guardar) */
+.modal-content-advertencia {
+    max-width: 500px;
+    padding: 32px;
+    gap: 14px;
+}
+
+.modal-icon-warning {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #FFF3D6;
+    color: #B7791F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-title-grande {
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.modal-actions-derecha {
+    justify-content: flex-end;
+}
+
+.btn-modal-ok {
+    flex: none;
+    padding: 14px 28px;
+}
+
+/* Navbar público con sesión iniciada */
+.public-navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.public-navbar-user-name {
+    color: #10271B;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+}
+
+.public-navbar-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #20A34A;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Menú lateral del cliente */
+.menu-item-boton {
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font: inherit;
+}
+
+.menu-item-boton .menu-item-text {
+    color: #68786F;
+}
+
+.menu-item-boton .menu-icon {
+    color: #68786F;
+}
+
+.menu-item-boton:hover {
+    background-color: #F7F8F7;
+}
+
+.menu-item.active .menu-icon {
+    color: #20A34A;
+}
+
+.sidebar-user-card {
+    background-color: #F1F8F2;
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.breadcrumb-text strong {
+    color: #10271B;
+    font-weight: 700;
+}
+
+.breadcrumb-sep {
+    margin: 0 6px;
+    color: #A8B5AC;
+}
+
+/* Perfil del cliente */
+.perfil-main {
+    background-color: #F6F8F5;
+    position: relative;
+    min-width: 0;
+}
+
+.alert-toast-bajo-topbar {
+    top: 96px;
+}
+
+.perfil-content {
+    padding: 40px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.perfil-titulo {
+    font-family: 'Inter', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.perfil-subtitulo {
+    font-size: 16px;
+}
+
+.perfil-card {
+    width: 100%;
+    max-width: 1100px;
+    background-color: white;
+    border: 1px solid #DDE7DF;
+    border-radius: 20px;
+    padding: 32px 40px;
+    box-shadow: 0px 4px 16px rgba(16, 39, 27, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.perfil-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.perfil-card-titulo {
+    color: #10271B;
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.perfil-card-subtitulo {
+    color: #68786F;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    margin: 0;
+}
+
+.badge-verificada {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: #E8F5E9;
+    color: #1B7F3A;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge-verificada-punto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #20A34A;
+}
+
+.perfil-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+}
+
+.perfil-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .perfil-grid {
+        grid-template-columns: 1fr;
+    }
+    .perfil-content {
+        padding: 24px 16px;
+    }
+    .perfil-card {
+        padding: 24px 20px;
+    }
 }

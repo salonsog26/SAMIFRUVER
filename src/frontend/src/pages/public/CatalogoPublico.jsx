@@ -4,6 +4,7 @@ import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import ProductCard from '../../components/public/ProductCard';
 import bannerCatalogo from '../../assets/banner-catalogo.webp';
+import { API_URL } from '../../utils/config';
 import { resolverImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
 
@@ -14,7 +15,7 @@ function CatalogoPublico() {
 
 
     useEffect(() => {
-        fetch('http://localhost:4000/api/productos')
+        fetch(`${API_URL}/api/productos`)
             .then((res) => res.json())
             .then((data) => {
 

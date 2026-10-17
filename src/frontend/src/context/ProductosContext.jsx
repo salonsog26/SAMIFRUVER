@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { API_URL } from '../utils/config';
 
 const ProductosContext = createContext(null);
-
-const API_URL = 'http://localhost:4000';
 
 export function validarProducto(datos) {
     const errores = {};
