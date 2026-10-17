@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { API_URL } from '../utils/config';
 
-import { API_URL } from '../utils/config';
 
 const ProductosContext = createContext(null);
 
