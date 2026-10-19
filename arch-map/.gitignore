@@ -1,0 +1,4 @@
+node_modules
+dist
+# Lo genera scripts/sync-repo.mjs en cada dev/build
+public/repo-status.json

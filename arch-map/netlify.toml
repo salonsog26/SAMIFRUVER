@@ -1,0 +1,24 @@
+# Despliegue del mapa en Netlify.
+# En Netlify configura "Base directory" = arch-map (la carpeta donde vive este proyecto dentro del repo).
+
+[build]
+  command = "npm run build"   # prebuild ejecuta scripts/sync-repo.mjs y luego vite build
+  publish = "dist"
+  # Reconstruir en CADA push, aunque el cambio no toque arch-map/:
+  # el mapa muestra la actividad de todo el repositorio.
+  ignore = "exit 1"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# repo-status.json cambia en cada despliegue: que el navegador no lo guarde en caché.
+[[headers]]
+  for = "/repo-status.json"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
