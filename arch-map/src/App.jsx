@@ -20,6 +20,7 @@ import { MapContext } from './context/MapContext';
 import { NODE_WIDTH, buildEdges, buildInitialNodes } from './lib/buildGraph';
 import { useRepoStatus } from './lib/repoStatus';
 import { loadUserId, saveUserId } from './lib/team';
+import { useLayout } from './lib/useMediaQuery';
 import { LAYERS } from './lib/theme';
 
 // Fuera del componente: se registran una sola vez (recomendación de React Flow).
@@ -37,7 +38,10 @@ function ArchitectureMap({ currentUser, onSwitchUser }) {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [mode, setMode] = useState('business'); // 'business' | 'technical'
   const [selectedId, setSelectedId] = useState(null);
+  const [overviewOpen, setOverviewOpen] = useState(false); // solo celular/tablet
   const repoStatus = useRepoStatus();
+  const layout = useLayout(); // 'phone' | 'tablet' | 'desktop'
+  const isDesktop = layout === 'desktop';
   const { setCenter, getZoom } = useReactFlow();
 
   // Los edges se recalculan con la posición actual de los nodos, la vista y la selección.
@@ -67,26 +71,55 @@ function ArchitectureMap({ currentUser, onSwitchUser }) {
     [mode, selectedId, relatedIds, currentUser, repoStatus]
   );
 
-  const onNodeClick = useCallback((_, node) => {
-    if (node.type === 'module') setSelectedId(node.id);
+  /**
+   * Centra la cámara en un módulo. En celular/tablet lo desplaza hacia la zona que
+   * no tapa el panel (arriba de la hoja inferior, o a la izquierda del cajón).
+   */
+  const focusNode = useCallback(
+    (id) => {
+      const target = nodes.find((n) => n.id === id);
+      if (!target) return;
+      const zoom = Math.max(getZoom(), 0.85);
+      let x = target.position.x + NODE_WIDTH / 2;
+      let y = target.position.y + 50;
+      if (layout === 'phone') y += (window.innerHeight * 0.62) / 2 / zoom;
+      if (layout === 'tablet') x += Math.min(380, window.innerWidth * 0.85) / 2 / zoom;
+      setCenter(x, y, { zoom, duration: 450 });
+    },
+    [nodes, getZoom, setCenter, layout]
+  );
+
+  const onNodeClick = useCallback(
+    (_, node) => {
+      if (node.type !== 'module') return;
+      setSelectedId(node.id);
+      setOverviewOpen(false);
+      if (!isDesktop) focusNode(node.id); // en pantallas pequeñas el nodo se ve diminuto: acercar
+    },
+    [isDesktop, focusNode]
+  );
+
+  const clearSelection = useCallback(() => {
+    setSelectedId(null);
+    setOverviewOpen(false);
   }, []);
 
-  const clearSelection = useCallback(() => setSelectedId(null), []);
-
-  // Selección desde el sidebar: además centra la cámara en el módulo.
+  // Selección desde el panel: además centra la cámara en el módulo.
   const selectAndFocus = useCallback(
     (id) => {
       setSelectedId(id);
-      const target = nodes.find((n) => n.id === id);
-      if (target) {
-        setCenter(target.position.x + NODE_WIDTH / 2, target.position.y + 50, {
-          zoom: Math.max(getZoom(), 0.85),
-          duration: 450,
-        });
-      }
+      focusNode(id);
     },
-    [nodes, setCenter, getZoom]
+    [focusNode]
   );
+
+  const openOverview = useCallback(() => {
+    setSelectedId(null);
+    setOverviewOpen((open) => !open);
+  }, []);
+
+  const panelVisible = isDesktop || Boolean(selectedId) || overviewOpen;
+  const panelVariant = { desktop: 'docked', tablet: 'drawer', phone: 'sheet' }[layout];
 
   // Escape cierra el detalle
   useEffect(() => {
@@ -94,6 +127,19 @@ function ArchitectureMap({ currentUser, onSwitchUser }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [clearSelection]);
+
+  const sidebar = (variant) => (
+    <Sidebar
+      architecture={architecture}
+      selectedNode={selectedNode}
+      mode={mode}
+      currentUser={currentUser}
+      repoStatus={repoStatus}
+      onSelect={selectAndFocus}
+      onClose={clearSelection}
+      variant={variant}
+    />
+  );
 
   return (
     <MapContext.Provider value={contextValue}>
@@ -107,6 +153,7 @@ function ArchitectureMap({ currentUser, onSwitchUser }) {
           team={team}
           currentUser={currentUser}
           onSwitchUser={onSwitchUser}
+          onOpenOverview={isDesktop ? undefined : openOverview}
         />
 
         <div className="flex min-h-0 flex-1">
@@ -124,35 +171,32 @@ function ArchitectureMap({ currentUser, onSwitchUser }) {
               edgesFocusable={false}
               deleteKeyCode={null}
               fitView
-              fitViewOptions={{ padding: 0.08 }}
-              minZoom={0.2}
+              fitViewOptions={{ padding: isDesktop ? 0.08 : 0.04 }}
+              minZoom={0.1}
               maxZoom={1.75}
             >
               <Background variant={BackgroundVariant.Dots} gap={22} size={1.2} color="#d6d3d1" />
               <Controls showInteractive={false} position="bottom-left" />
-              <MiniMap
-                position="bottom-right"
-                pannable
-                zoomable
-                maskColor="rgba(250, 250, 249, 0.75)"
-                nodeBorderRadius={6}
-                nodeColor={(n) => (n.type === 'lane' ? 'transparent' : LAYERS[n.data.layer]?.minimap ?? '#a8a29e')}
-                nodeStrokeColor={() => 'transparent'}
-                style={{ width: 180, height: 120 }}
-                className="!rounded-lg !border !border-stone-200 !shadow-sm"
-              />
+              {layout !== 'phone' && (
+                <MiniMap
+                  position="bottom-right"
+                  pannable
+                  zoomable
+                  maskColor="rgba(250, 250, 249, 0.75)"
+                  nodeBorderRadius={6}
+                  nodeColor={(n) => (n.type === 'lane' ? 'transparent' : LAYERS[n.data.layer]?.minimap ?? '#a8a29e')}
+                  nodeStrokeColor={() => 'transparent'}
+                  style={{ width: 180, height: 120 }}
+                  className="!rounded-lg !border !border-stone-200 !shadow-sm"
+                />
+              )}
             </ReactFlow>
+
+            {/* En tablet el cajón vive dentro del área del mapa */}
+            {panelVisible && layout === 'tablet' && sidebar('drawer')}
           </main>
 
-          <Sidebar
-            architecture={architecture}
-            selectedNode={selectedNode}
-            mode={mode}
-            currentUser={currentUser}
-            repoStatus={repoStatus}
-            onSelect={selectAndFocus}
-            onClose={clearSelection}
-          />
+          {panelVisible && layout !== 'tablet' && sidebar(panelVariant)}
         </div>
       </div>
     </MapContext.Provider>

@@ -11,6 +11,17 @@ body,
   height: 100%;
 }
 
+/* En celular, 100dvh descuenta las barras del navegador */
+@supports (height: 100dvh) {
+  #root {
+    height: 100dvh;
+  }
+}
+
+body {
+  overscroll-behavior: none; /* evita el "tirar para recargar" al mover el mapa */
+}
+
 body {
   @apply bg-stone-50 font-sans text-stone-800 antialiased;
 }
@@ -54,6 +65,32 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .welcome-overlay,
   .welcome-card {
+    animation: none;
+  }
+}
+
+/* Paneles en celular (hoja inferior) y tablet (cajón lateral) */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+.panel-sheet {
+  animation: sheet-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.panel-drawer {
+  animation: drawer-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-sheet,
+  .panel-drawer {
     animation: none;
   }
 }

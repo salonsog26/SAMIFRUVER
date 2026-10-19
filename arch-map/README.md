@@ -3,6 +3,7 @@
 Mapa navegable de la arquitectura de [SAMIFRUVER](https://github.com/salonsog26/SAMIFRUVER) construido con React, Vite, Tailwind CSS y React Flow (`@xyflow/react`).
 
 - **Selección de usuario al entrar**, con saludo personalizado (apodos en `meta.team`). Los módulos a cargo de esa persona se marcan con "Tú". Se recuerda mientras la pestaña esté abierta. El botón ⇄ de la barra superior cambia de usuario.
+- **Funciona en celular y tablet:** en celular el detalle sube como hoja inferior, en tablet entra como cajón lateral y en escritorio queda fijo a la derecha. El botón ⓘ abre el resumen en pantallas pequeñas.
 - Módulos arrastrables, agrupados por capa (Negocio, Frontend, Backend, Datos, Calidad).
 - Sidebar derecho con el detalle del módulo, su responsable, su último cambio en el repo y sus conexiones (clic para saltar al módulo vecino).
 - Toggle **Vista No-Técnica / Vista Técnica**: cambia la descripción (`description` ↔ `techDesc`), las etiquetas de las flechas y muestra la ruta, el commit y el enlace a GitHub.
@@ -44,6 +45,7 @@ arch-map/
     │   ├── buildGraph.js        ← JSON → nodos/edges de React Flow
     │   ├── repoStatus.js        ← carga del estado del repo y fechas relativas
     │   ├── team.js              ← saludos, apodos, avatar, sesión
+    │   ├── useMediaQuery.js     ← celular / tablet / escritorio
     │   └── theme.js             ← colores por capa y estilos de relación
     └── components/
         ├── UserGate.jsx         ← pantalla "¿Quién eres?" y bienvenida

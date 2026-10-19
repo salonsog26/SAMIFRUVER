@@ -5,7 +5,7 @@ import { avatarColor, displayName, greetingText, initials, ownedModules } from '
 /** Pantalla inicial: elegir quién está usando el mapa. */
 export function UserPicker({ team, project, onSelect }) {
   return (
-    <div className="flex min-h-full items-center justify-center bg-stone-50 px-4 py-10">
+    <div className="flex h-full items-center justify-center overflow-y-auto bg-stone-50 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-stone-900 text-white shadow-sm">

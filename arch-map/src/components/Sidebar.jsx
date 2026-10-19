@@ -127,7 +127,7 @@ function Overview({ architecture, mode, currentUser, repoStatus }) {
   const { meta } = architecture;
 
   return (
-    <div className="space-y-7 p-6">
+    <div className="space-y-7 p-5 sm:p-6">
       <div>
         <h2 className="text-lg font-semibold text-stone-900">{meta.project}</h2>
         <p className="mt-2 text-sm leading-relaxed text-stone-600">{meta.summary}</p>
@@ -141,8 +141,8 @@ function Overview({ architecture, mode, currentUser, repoStatus }) {
       <div className="flex gap-3 rounded-xl border border-stone-200 bg-stone-50 p-4 text-sm text-stone-600">
         <MousePointerClick className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" />
         <p>
-          Haz clic en un módulo para ver su detalle. Puedes arrastrar los módulos y hacer zoom con la rueda del
-          mouse.
+          Toca o haz clic en un módulo para ver su detalle. Puedes arrastrar los módulos y hacer zoom con la
+          rueda del mouse o pellizcando la pantalla.
         </p>
       </div>
 
@@ -268,7 +268,7 @@ function NodeDetail({ node, architecture, mode, currentUser, repoStatus, onSelec
   const isTechnical = mode === 'technical';
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-5 sm:p-6">
       <div>
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-wrap gap-1.5">
@@ -278,14 +278,16 @@ function NodeDetail({ node, architecture, mode, currentUser, repoStatus, onSelec
             )}
             <Chip className={status.chip}>{status.label}</Chip>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar detalle"
-            className="-mr-2 -mt-1 rounded-md p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Cerrar detalle"
+              className="-mr-2 -mt-1 rounded-md p-1.5 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
         <h2 className="mt-3 text-xl font-semibold leading-tight text-stone-900">{node.label}</h2>
       </div>
@@ -395,17 +397,57 @@ function NodeDetail({ node, architecture, mode, currentUser, repoStatus, onSelec
 }
 
 /** Panel lateral derecho. */
-export default function Sidebar({ architecture, selectedNode, mode, currentUser, repoStatus, onSelect, onClose }) {
+const VARIANT_CLASS = {
+  // Escritorio: columna fija a la derecha
+  docked: 'w-[380px] shrink-0 border-l',
+  // Tablet: cajón que se superpone al mapa por la derecha
+  drawer: 'panel-drawer absolute inset-y-0 right-0 z-20 w-[min(380px,85vw)] border-l shadow-2xl',
+  // Celular: hoja que sube desde abajo
+  sheet:
+    'panel-sheet fixed inset-x-0 bottom-0 z-30 max-h-[62dvh] rounded-t-2xl border-t shadow-[0_-12px_40px_rgba(28,25,23,0.18)] pb-[env(safe-area-inset-bottom)]',
+};
+
+/** Panel de información. `variant` cambia según el tamaño de pantalla. */
+export default function Sidebar({
+  architecture,
+  selectedNode,
+  mode,
+  currentUser,
+  repoStatus,
+  onSelect,
+  onClose,
+  variant = 'docked',
+}) {
+  const floating = variant !== 'docked';
+
   return (
-    <aside className="flex w-[380px] shrink-0 flex-col border-l border-stone-200 bg-white">
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-stone-100 px-6 text-xs font-medium text-stone-500">
+    <aside
+      className={`flex flex-col border-stone-200 bg-white ${VARIANT_CLASS[variant]}`}
+      aria-label={selectedNode ? 'Detalle del módulo' : 'Resumen del proyecto'}
+    >
+      {variant === 'sheet' && (
+        <div className="flex shrink-0 justify-center pt-2" aria-hidden="true">
+          <span className="h-1 w-10 rounded-full bg-stone-300" />
+        </div>
+      )}
+      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-stone-100 px-5 text-xs font-medium text-stone-500 sm:px-6">
         {selectedNode ? <Layers className="h-3.5 w-3.5" /> : <Users className="h-3.5 w-3.5" />}
         {selectedNode ? 'Detalle del módulo' : 'Resumen del proyecto'}
         <span className="ml-auto rounded-md bg-stone-100 px-2 py-0.5 text-[11px] text-stone-600">
           {mode === 'technical' ? 'Vista Técnica' : 'Vista No-Técnica'}
         </span>
+        {floating && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar panel"
+            className="-mr-2 flex h-8 w-8 items-center justify-center rounded-md text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overscroll-contain">
         {selectedNode ? (
           <NodeDetail
             key={selectedNode.id}
@@ -415,7 +457,7 @@ export default function Sidebar({ architecture, selectedNode, mode, currentUser,
             currentUser={currentUser}
             repoStatus={repoStatus}
             onSelect={onSelect}
-            onClose={onClose}
+            onClose={floating ? null : onClose}
           />
         ) : (
           <Overview architecture={architecture} mode={mode} currentUser={currentUser} repoStatus={repoStatus} />
