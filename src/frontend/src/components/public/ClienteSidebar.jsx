@@ -1,6 +1,6 @@
 // src/components/public/ClienteSidebar.jsx — menú lateral del área "Mi cuenta" (cliente)
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { User, Package, MapPin, Heart, LogOut, X } from 'lucide-react';
 import logo from '../../assets/logo-samifruver.png';
 import { obtenerSesion, cerrarSesion } from '../../utils/auth';
@@ -9,9 +9,8 @@ import useMenuLateral from '../../utils/useMenuLateral';
 import BarraMovil from '../admin/BarraMovil';
 import '../../styles/variables.css';
 
-// "Mis pedidos", "Direcciones" y "Favoritos" aparecen en el diseño pero aún no tienen pantalla.
+// "Direcciones" y "Favoritos" aparecen en el diseño pero aún no tienen pantalla.
 const OPCIONES_PROXIMAMENTE = [
-    { texto: 'Mis pedidos', Icono: Package },
     { texto: 'Direcciones', Icono: MapPin },
     { texto: 'Favoritos', Icono: Heart }
 ];
@@ -45,6 +44,10 @@ function ClienteSidebar({ nombre }) {
                         <User className="menu-icon" size={18} />
                         <span className="menu-item-text">Mi perfil</span>
                     </span>
+                    <Link to="/pedidos" className="menu-item">
+                        <Package className="menu-icon" size={18} />
+                        <span className="menu-item-text">Mis pedidos</span>
+                    </Link>
                     {OPCIONES_PROXIMAMENTE.map(({ texto, Icono }) => (
                         <button key={texto} type="button" className="menu-item menu-item-boton" title="Próximamente" aria-disabled="true" onClick={(e) => e.preventDefault()}>
                             <Icono className="menu-icon" size={18} />

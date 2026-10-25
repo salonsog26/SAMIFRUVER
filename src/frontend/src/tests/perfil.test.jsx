@@ -151,9 +151,14 @@ describe('Barra lateral del cliente', () => {
         expect(obtenerSesion()).toBeNull();
         await waitFor(() => expect(rutaActual()).toBe('/login'));
     });
-    it('las opciones futuras (pedidos, direcciones, favoritos) no navegan', async () => {
+    it('las opciones futuras (direcciones, favoritos) no navegan', async () => {
+        montar();
+        await userEvent.click(screen.getByText('Direcciones'));
+        expect(rutaActual()).toBe('/perfil');
+    });
+    it('"Mis pedidos" lleva al historial (Épica 3)', async () => {
         montar();
         await userEvent.click(screen.getByText('Mis pedidos'));
-        expect(rutaActual()).toBe('/perfil');
+        expect(rutaActual()).toBe('/pedidos');
     });
 });

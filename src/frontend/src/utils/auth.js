@@ -26,10 +26,16 @@ export async function login(correo, contrasena) {
     }
 }
 
+// El carrito (y cualquier otro dato por cliente) se recalcula cuando alguien inicia o cierra sesión.
+function avisarCambioDeSesion() {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('samifruber:carrito'));
+}
+
 export function guardarSesion(usuario) {
     try {
         localStorage.setItem(CLAVE_SESION, JSON.stringify(usuario));
     } catch (error) { /* almacenamiento no disponible */ }
+    avisarCambioDeSesion();
 }
 
 export function obtenerSesion() {
@@ -50,4 +56,5 @@ export function cerrarSesion() {
     try {
         localStorage.removeItem(CLAVE_SESION);
     } catch (error) { /* nada */ }
+    avisarCambioDeSesion();
 }

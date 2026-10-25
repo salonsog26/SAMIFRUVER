@@ -27,6 +27,23 @@ const setPool = (nuevo) => { pool = nuevo; };
 
 const query = (texto, parametros = []) => getPool().query(texto, parametros);
 
+// Ejecuta `fn(cliente)` dentro de una transacción: o se guardan todos los cambios o ninguno.
+// Se usa al crear/cancelar un pedido (pedido + productos + stock deben quedar consistentes).
+const transaccion = async (fn) => {
+    const cliente = await getPool().connect();
+    try {
+        await cliente.query('BEGIN');
+        const resultado = await fn(cliente);
+        await cliente.query('COMMIT');
+        return resultado;
+    } catch (error) {
+        try { await cliente.query('ROLLBACK'); } catch (e) { /* conexión ya perdida */ }
+        throw error;
+    } finally {
+        cliente.release();
+    }
+};
+
 const cerrar = async () => {
     if (pool && pool.end) await pool.end();
     pool = null;
@@ -35,4 +52,4 @@ const cerrar = async () => {
 // Código de PostgreSQL para "violación de índice único".
 const esDuplicado = (error) => Boolean(error) && error.code === '23505';
 
-module.exports = { query, getPool, setPool, cerrar, esDuplicado };
+module.exports = { query, transaccion, getPool, setPool, cerrar, esDuplicado };

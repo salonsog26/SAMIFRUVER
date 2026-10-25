@@ -4,7 +4,8 @@ import Badge from '../ui/Badge';
 import { resolverImagen, alFallarImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
 
-function ProductCard({ nombre, categoria, precio, unidad = 'lb', imagen }) {
+// onAgregar es opcional: sin él la tarjeta es solo informativa. agotado deshabilita el botón.
+function ProductCard({ nombre, categoria, precio, unidad = 'lb', imagen, agotado = false, onAgregar }) {
     return (
         <div className="product-card">
             <div className="product-card-image-wrapper">
@@ -16,7 +17,15 @@ function ProductCard({ nombre, categoria, precio, unidad = 'lb', imagen }) {
                 <div className="product-card-price">
                     {precio} <span className="product-card-unit">/ {unidad}</span>
                 </div>
-                <button type="button" className="btn-primary-full">Agregar al carrito</button>
+                <button
+                    type="button"
+                    className={`btn-primary-full${agotado ? ' btn-primary-full-agotado' : ''}`}
+                    disabled={agotado}
+                    onClick={onAgregar}
+                    aria-label={agotado ? `${nombre} agotado` : `Agregar ${nombre} al carrito`}
+                >
+                    {agotado ? 'Agotado' : 'Agregar al carrito'}
+                </button>
             </div>
         </div>
     );

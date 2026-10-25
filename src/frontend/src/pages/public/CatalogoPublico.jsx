@@ -1,18 +1,37 @@
 // src/pages/public/CatalogoPublico.jsx
 import { API_URL } from '../../utils/config';
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import ProductCard from '../../components/public/ProductCard';
 import bannerCatalogo from '../../assets/banner-catalogo.webp';
+import Alert from '../../components/ui/Alert';
 import { resolverImagen } from '../../utils/imagenes';
+import { agregarAlCarrito } from '../../utils/carrito';
 import '../../styles/variables.css';
 
 function CatalogoPublico() {
 
     const [productosDestacados, setProductosDestacados] = useState([]);
     const [cargando, setCargando] = useState(true);
+    const [aviso, setAviso] = useState(null);
+    const navigate = useNavigate();
 
+    // Agregar al carrito (E3-HU2). Sin sesión de cliente lleva al login.
+    const agregar = (producto) => {
+        const r = agregarAlCarrito({ ...producto, precio: producto.precioNumero });
+        if (r.sinSesion) { navigate('/login'); return; }
+        setAviso(r.ok
+            ? { tipo: 'exito', mensaje: `${producto.nombre} se agregó al carrito` }
+            : { tipo: 'advertencia', mensaje: r.mensaje });
+    };
+
+    useEffect(() => {
+        if (!aviso) return undefined;
+        const t = setTimeout(() => setAviso(null), 3000);
+        return () => clearTimeout(t);
+    }, [aviso]);
 
     useEffect(() => {
         fetch(`${API_URL}/api/productos`)
@@ -20,6 +39,9 @@ function CatalogoPublico() {
             .then((data) => {
 
                 const productosMapeados = data.map(prod => ({
+                    id: prod.id,
+                    precioNumero: Number(prod.precio),
+                    stock: Number(prod.stock),
                     nombre: prod.nombre,
                     categoria: prod.categoria,
                     precio: `$${prod.precio.toLocaleString()} COP`,
@@ -37,7 +59,8 @@ function CatalogoPublico() {
 
     return (
         <div className="public-page">
-            <Navbar cartCount={0} />
+            <Navbar />
+            {aviso && <Alert tipo={aviso.tipo} mensaje={aviso.mensaje} className="alert-toast-fijo" />}
 
             {/* Hero */}
             <section className="public-hero">
@@ -68,8 +91,17 @@ function CatalogoPublico() {
                     <p style={{ padding: '20px', fontFamily: 'Inter', color: '#8D6E63' }}>Cargando productos de la cosecha...</p>
                 ) : (
                     <div className="public-products-grid">
-                        {productosDestacados.map((producto, index) => (
-                            <ProductCard key={index} {...producto} />
+                        {productosDestacados.map((producto) => (
+                            <ProductCard
+                                key={producto.id}
+                                nombre={producto.nombre}
+                                categoria={producto.categoria}
+                                precio={producto.precio}
+                                unidad={producto.unidad}
+                                imagen={producto.imagen}
+                                agotado={!(producto.stock > 0)}
+                                onAgregar={() => agregar(producto)}
+                            />
                         ))}
                     </div>
                 )}

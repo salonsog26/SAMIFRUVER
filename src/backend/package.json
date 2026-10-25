@@ -11,7 +11,8 @@
         "test:html": "vitest run --coverage --reporter=default --reporter=html --outputFile.html=./reports/test-report/index.html",
         "db:init": "node scripts/db-init.js",
         "db:migrar-json": "node scripts/migrar-json.js",
-        "db:hash": "node scripts/hash-password.js"
+        "db:hash": "node scripts/hash-password.js",
+        "pedido:avanzar": "node scripts/avanzar-pedido.js"
     },
     "dependencies": {
         "cors": "^2.8.5",

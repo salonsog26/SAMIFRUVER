@@ -10,4 +10,9 @@ Este directorio contiene el código fuente de la aplicación del lado del client
 - En ≤768 px las tablas de productos se muestran como tarjetas.
 - Inputs a 16 px (evita el zoom de iOS).
 - El formulario de producto incluye el campo "Foto del producto" (JPG/PNG/WEBP, ≤2 MB, ≥300x300), obligatorio.
-- Tests: `npm test` (83).
+- Tests: `npm test` (102).
+
+## Épica 3 · Pedidos
+
+Rutas de cliente: `/carrito`, `/pedido-creado/:id`, `/pedidos` (historial) y `/pedidos/:id` (seguimiento y cancelación). El carrito se guarda en `localStorage` por cliente. Dirección y pago son simulados (Visa ···· 4242 / Mercado Pago, sin cobro real) y el mapa del repartidor es ilustrativo. Estilos en `src/styles/pedidos.css`.
+Tests: `npm test` (102).
