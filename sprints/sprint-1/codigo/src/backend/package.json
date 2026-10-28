@@ -1,0 +1,13 @@
+{
+    "name": "samifruber-backend",
+    "version": "1.0.0",
+    "description": "Backend para SAMIFRUBER",
+    "main": "server.js",
+    "scripts": {
+        "dev": "node --watch server.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.19.2"
+    }
+}

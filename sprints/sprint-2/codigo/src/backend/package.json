@@ -1,0 +1,23 @@
+{
+    "name": "samifruber-backend",
+    "version": "1.0.0",
+    "description": "Backend para SAMIFRUBER",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node --watch server.js",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:html": "vitest run --coverage --reporter=default --reporter=html --outputFile.html=./reports/test-report/index.html"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.19.2"
+    },
+    "devDependencies": {
+        "@vitest/coverage-v8": "^2.1.8",
+        "@vitest/ui": "^2.1.8",
+        "supertest": "^7.0.0",
+        "vitest": "^2.1.8"
+    }
+}

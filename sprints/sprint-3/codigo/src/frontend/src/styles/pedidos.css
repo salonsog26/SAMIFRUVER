@@ -1,0 +1,235 @@
+/* Épica 3 · Gestión de pedidos (carrito, confirmación, historial, seguimiento, cancelación) */
+.ped-pagina { background: #F6F8F5; min-height: 100vh; display: flex; flex-direction: column; }
+.ped-contenido { width: 100%; max-width: 1120px; margin: 0 auto; padding: 24px 24px 56px; flex: 1; box-sizing: border-box; }
+.ped-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ped-cargando { color: #68786F; padding: 40px 0; text-align: center; }
+.ped-centrado { display: flex; flex-direction: column; align-items: center; }
+
+.ped-migas { font-size: 13px; color: #68786F; margin-bottom: 8px; }
+.ped-titulo { font-size: 30px; line-height: 1.2; color: #10271B; margin: 0 0 6px; font-weight: 800; }
+.ped-titulo-medio { font-size: 18px; }
+.ped-subtitulo { color: #68786F; margin: 0 0 20px; font-size: 15px; }
+.ped-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ped-encabezado-pedido { background: #fff; border: 1px solid #DDE7DF; border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; }
+.ped-numero { margin: 0; font-weight: 700; color: #10271B; font-size: 18px; }
+.ped-fecha { margin: 2px 0 0; color: #68786F; font-size: 13px; }
+.ped-texto { color: #3d4f45; margin: 0 0 8px; line-height: 1.5; }
+.ped-texto-ok { color: #1B7F3A; display: flex; gap: 6px; align-items: center; margin: 0; font-size: 14px; }
+
+/* Layout */
+.ped-columnas { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; margin-top: 16px; }
+.ped-columnas-seguimiento { grid-template-columns: minmax(0, 1fr) 340px; }
+.ped-columnas-seguimiento.con-mapa { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 320px; }
+.ped-columna-principal, .ped-columna-lateral, .ped-columna-mapa, .ped-columna-media { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ped-columnas-seguimiento .ped-columna-media { grid-column: 1; }
+.ped-dos-tarjetas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.ped-tarjeta { background: #fff; border: 1px solid #DDE7DF; border-radius: 14px; padding: 18px; box-sizing: border-box; }
+.ped-tarjeta-titulo { margin: 0 0 12px; font-size: 16px; color: #10271B; font-weight: 700; }
+.ped-seccion-titulo { font-size: 20px; color: #10271B; margin: 0 0 12px; }
+
+/* Franjas / avisos */
+.ped-franja { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px; margin: 0 0 16px; font-size: 14px; border: 1px solid transparent; }
+.ped-franja-texto { flex: 1; }
+.ped-franja-info { background: #E8F5EC; border-color: #BFE3C9; color: #14532D; }
+.ped-franja-exito { background: #E8F5E9; border-color: #20A34A; color: #14532D; }
+.ped-franja-error { background: #FDECEC; border-color: #F2B8B8; color: #C62828; }
+.ped-franja-cerrar { background: none; border: 0; cursor: pointer; color: inherit; display: inline-flex; padding: 4px; }
+.ped-nota { font-size: 13px; color: #68786F; margin: 4px 0 0; }
+.ped-nota-info { background: #F1F5F2; border-radius: 10px; padding: 8px 12px; }
+.ped-aviso-stock { font-size: 13px; color: #8A5A00; background: #FFF4D6; border-radius: 10px; padding: 8px 12px; margin: 8px 0 0; }
+.ped-ayuda { font-size: 13px; color: #68786F; margin: 6px 0 0; }
+.ped-error-pago { font-size: 13px; color: #C62828; margin: 6px 0 0; }
+
+/* Insignias */
+.ped-insignia { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.ped-insignia-punto { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.ped-insignia-verde { background: #E8F5EC; color: #1B7F3A; }
+.ped-insignia-ambar { background: #FFF4D6; color: #8A5A00; }
+.ped-insignia-rojo { background: #FDECEC; color: #C62828; }
+
+/* Botones */
+.ped-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: none; border: 1.5px solid transparent; box-sizing: border-box; font-family: inherit; }
+.ped-boton:disabled, .ped-boton[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+.ped-boton-primario { background: #20A34A; color: #fff; }
+.ped-boton-primario:hover:not(:disabled) { background: #1B8E40; }
+.ped-boton-secundario { background: #fff; color: #10271B; border-color: #DDE7DF; }
+.ped-boton-secundario:hover:not(:disabled) { background: #F1F5F2; }
+.ped-boton-peligro { background: #fff; color: #C62828; border-color: #C62828; }
+.ped-boton-peligro:hover:not(:disabled) { background: #FDECEC; }
+.ped-boton-bloque { width: 100%; }
+.ped-enlace-suave { color: #20A34A; background: none; border: 0; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; padding: 0; text-decoration: none; }
+.ped-enlace-fuerte { color: #C62828; background: none; border: 0; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; padding: 0; }
+
+/* Línea de seguimiento */
+.ped-linea { margin-bottom: 16px; }
+.ped-linea-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+.ped-linea-cabecera .ped-tarjeta-titulo { margin: 0; }
+.ped-linea-fecha { font-size: 13px; color: #68786F; }
+.ped-etapas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+.ped-etapa { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; color: #68786F; }
+.ped-etapa-marca { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 2px solid #DDE7DF; display: inline-flex; align-items: center; justify-content: center; z-index: 1; }
+.ped-etapa-punto { width: 8px; height: 8px; border-radius: 50%; background: #DDE7DF; }
+.ped-etapa.hecha .ped-etapa-marca { background: #20A34A; border-color: #20A34A; color: #fff; }
+.ped-etapa:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 50%; width: 100%; height: 2px; background: #DDE7DF; }
+.ped-etapa.con-tramo::after { background: #20A34A; }
+.ped-etapa-nombre { font-weight: 700; font-size: 14px; color: #10271B; }
+.ped-etapa-hora { font-size: 12px; }
+
+/* Productos */
+.ped-productos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ped-producto { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #EEF3EF; }
+.ped-producto:first-child { border-top: 0; }
+.ped-producto-img, .ped-producto-img-grande { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: #E8F5EC; flex-shrink: 0; }
+.ped-producto-img-grande { width: 72px; height: 72px; }
+.ped-producto-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ped-producto-nombre { font-weight: 700; color: #10271B; }
+.ped-producto-detalle, .ped-producto-cant { color: #68786F; font-size: 13px; }
+.ped-producto-total { font-weight: 700; color: #10271B; white-space: nowrap; }
+
+/* Carrito */
+.ped-carrito-lista { list-style: none; margin: 0; padding: 0; }
+.ped-carrito-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #EEF3EF; flex-wrap: wrap; }
+.ped-carrito-item:first-child { border-top: 0; }
+.ped-carrito-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 1; flex-wrap: wrap; }
+.ped-carrito-precio { font-weight: 700; color: #10271B; }
+.ped-cantidad { display: inline-flex; align-items: center; border: 1.5px solid #DDE7DF; border-radius: 10px; overflow: hidden; background: #fff; }
+.ped-cantidad button { width: 36px; height: 36px; border: 0; background: #F6F8F5; cursor: pointer; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; }
+.ped-cantidad button:disabled { opacity: .4; cursor: not-allowed; }
+.ped-cantidad span { min-width: 36px; text-align: center; font-weight: 700; }
+
+/* Dirección, pago */
+.ped-entrega { display: flex; gap: 12px; align-items: flex-start; }
+.ped-entrega > div { display: flex; flex-direction: column; font-size: 14px; color: #3d4f45; }
+.ped-entrega strong { color: #10271B; }
+.ped-entrega-icono { color: #20A34A; flex-shrink: 0; margin-top: 2px; }
+.ped-entrega-pago { margin: 12px 0 0; padding-top: 12px; border-top: 1px solid #EEF3EF; color: #3d4f45; font-size: 14px; }
+.ped-agregar-dir { margin-top: 10px; }
+.ped-form-direccion { display: grid; gap: 10px; margin-top: 12px; }
+.ped-form-direccion label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #10271B; }
+.ped-form-direccion input { padding: 10px 12px; border: 1.5px solid #DDE7DF; border-radius: 10px; font-size: 14px; font-family: inherit; }
+.ped-form-botones { display: flex; gap: 10px; flex-wrap: wrap; }
+.ped-opciones { display: flex; flex-direction: column; gap: 10px; }
+.ped-opcion { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid #DDE7DF; border-radius: 12px; cursor: pointer; background: #fff; }
+.ped-opcion { width: 100%; text-align: left; font-family: inherit; }
+.ped-opcion.seleccionada { border-color: #20A34A; background: #F0FAF3; }
+.ped-opcion-icono.vacio { color: #BFD2C4; }
+.ped-cantidad button.tope { opacity: .4; }
+.ped-tarjeta.con-error { border-color: #C62828; }
+.ped-opcion input { accent-color: #20A34A; }
+.ped-opcion-icono { color: #20A34A; display: inline-flex; }
+.ped-opcion-texto { display: flex; flex-direction: column; font-size: 14px; }
+
+/* Resumen */
+.ped-resumen { display: flex; flex-direction: column; gap: 8px; }
+.ped-resumen-fila, .ped-resumen-total { display: flex; justify-content: space-between; gap: 8px; color: #3d4f45; font-size: 14px; }
+.ped-resumen-total { border-top: 1px solid #EEF3EF; padding-top: 10px; margin-top: 4px; font-size: 16px; color: #10271B; }
+.ped-resumen-total strong { font-size: 20px; }
+.ped-resumen-cantidades { margin: 0; color: #68786F; font-size: 13px; }
+.ped-resumen-etiqueta { margin: 8px 0 0; font-size: 13px; color: #68786F; }
+.ped-resumen-grande { font-size: 26px; color: #10271B; }
+.ped-resumen-seguro { margin: 6px 0 0; font-size: 12px; color: #68786F; text-align: center; }
+
+/* Confirmación */
+.ped-confirmacion { background: #fff; border: 1px solid #DDE7DF; border-radius: 16px; padding: 32px 24px; text-align: center; max-width: 560px; margin: 8px auto 0; }
+.ped-confirmacion-check { width: 64px; height: 64px; border-radius: 50%; background: #20A34A; color: #fff; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.ped-confirmacion-titulo { margin: 0 0 6px; font-size: 22px; color: #10271B; }
+.ped-confirmacion-numero { font-weight: 800; color: #20A34A; font-size: 20px; margin: 0 0 6px; }
+.ped-confirmacion-detalle { color: #68786F; margin: 0 0 20px; }
+.ped-confirmacion-botones { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* Historial */
+.ped-pestanas { display: flex; gap: 4px; border-bottom: 1px solid #DDE7DF; margin: 0 0 20px; overflow-x: auto; }
+.ped-pestanas a, .ped-pestanas button, .ped-pestanas span { padding: 10px 16px; font-size: 14px; font-weight: 600; color: #68786F; background: none; border: 0; border-bottom: 3px solid transparent; text-decoration: none; white-space: nowrap; font-family: inherit; }
+.ped-pestanas .activa, .ped-pestanas [aria-current="page"] { color: #10271B; border-bottom-color: #20A34A; }
+.ped-pestana-pronto { opacity: .55; cursor: not-allowed; }
+.ped-historial-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.ped-historial-cabecera h2 { margin: 0; font-size: 20px; color: #10271B; }
+.ped-filtro { position: relative; display: inline-flex; align-items: center; }
+.ped-filtro select { appearance: none; padding: 10px 36px 10px 14px; border: 1.5px solid #DDE7DF; border-radius: 10px; background: #fff; font-size: 14px; font-family: inherit; color: #10271B; }
+.ped-filtro svg { position: absolute; right: 12px; pointer-events: none; color: #68786F; }
+.ped-tabla { background: #fff; border: 1px solid #DDE7DF; border-radius: 14px; overflow: hidden; }
+.ped-tabla-cabecera, .ped-tabla-fila { display: grid; grid-template-columns: 1fr 1.5fr 1fr 1.2fr 1fr; gap: 12px; align-items: center; padding: 14px 18px; }
+.ped-tabla-cabecera { background: #F1F5F2; font-size: 13px; font-weight: 700; color: #68786F; }
+.ped-tabla-fila { border-top: 1px solid #EEF3EF; cursor: pointer; font-size: 14px; color: #3d4f45; }
+.ped-tabla-fila:hover { background: #F8FBF9; }
+.ped-celda-numero { font-weight: 700; color: #10271B; }
+.ped-celda-total { font-weight: 700; color: #10271B; }
+.ped-celda-accion { text-align: right; }
+.ped-celda-accion a { color: #20A34A; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+.ped-tabla-vacia { padding: 24px; text-align: center; color: #68786F; margin: 0; }
+.ped-tabla-pie { display: flex; justify-content: space-between; margin-top: 10px; font-size: 13px; color: #68786F; gap: 8px; flex-wrap: wrap; }
+.ped-fila-historial { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 14px; }
+.ped-vacio { background: #fff; border: 1px dashed #BFD2C4; border-radius: 16px; padding: 40px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ped-vacio-icono { color: #20A34A; }
+.ped-vacio-titulo { margin: 0; font-size: 20px; color: #10271B; }
+.ped-vacio-texto { margin: 0 0 8px; color: #68786F; max-width: 420px; }
+
+/* Seguimiento: llegada, mapa, repartidor, entrega */
+.ped-llegada { background: #fff; border: 1px solid #DDE7DF; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.ped-llegada .ped-tarjeta-titulo { margin: 0; }
+.ped-llegada > span { color: #3d4f45; font-size: 14px; }
+.ped-mapa { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid #DDE7DF; background: #EAF3EC; }
+.ped-mapa svg { display: block; width: 100%; height: 200px; }
+.ped-mapa-nota { display: block; padding: 8px 12px; font-size: 12px; color: #68786F; background: #fff; }
+.ped-repartidor { display: flex; align-items: center; gap: 12px; }
+.ped-repartidor > div { display: flex; flex-direction: column; font-size: 14px; color: #68786F; }
+.ped-repartidor strong { color: #10271B; }
+.ped-repartidor-icono { width: 44px; height: 44px; border-radius: 50%; background: #E8F5EC; color: #20A34A; display: inline-flex; align-items: center; justify-content: center; }
+.ped-repartidor-contacto { margin: 12px 0 0; font-size: 14px; color: #3d4f45; }
+.ped-entregado-banda { display: flex; align-items: center; gap: 14px; background: #E8F5EC; border: 1px solid #BFE3C9; color: #14532D; border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; }
+.ped-entregado-banda > div { display: flex; flex-direction: column; font-size: 14px; }
+
+/* Modal de cancelación */
+.ped-modal { position: relative; max-width: 440px; width: calc(100% - 32px); text-align: center; padding: 28px 24px 24px; box-sizing: border-box; }
+.ped-modal-cerrar { position: absolute; top: 12px; right: 12px; background: none; border: 0; cursor: pointer; color: #68786F; display: inline-flex; }
+.ped-modal-icono { width: 52px; height: 52px; border-radius: 50%; background: #FDECEC; color: #C62828; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+.ped-modal-titulo { margin: 0 0 8px; font-size: 20px; color: #10271B; }
+.ped-modal-pedido { font-weight: 700; color: #10271B; margin: 8px 0 16px; }
+.ped-modal-nota { font-size: 13px; color: #68786F; margin: 0 0 12px; }
+.ped-modal-botones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.ped-modal-botones .ped-boton { flex: 1; min-width: 130px; }
+
+/* Navbar (clientes) y toasts del catálogo */
+.public-navbar-links { display: flex; align-items: center; gap: 4px; }
+.public-navbar-link { padding: 8px 12px; border-radius: 10px; color: #10271B; font-weight: 600; font-size: 14px; text-decoration: none; white-space: nowrap; }
+.public-navbar-link:hover { background: #F1F5F2; }
+.public-navbar-link.activo, .public-navbar-link.active { color: #20A34A; background: #E8F5EC; }
+.alert-toast-fijo { position: fixed; top: 84px; right: 24px; z-index: 2000; max-width: calc(100% - 32px); }
+.btn-primary-full-agotado, .btn-primary-full:disabled { background: #DDE7DF; color: #68786F; cursor: not-allowed; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .ped-columnas-seguimiento.con-mapa { grid-template-columns: minmax(0, 1fr) 320px; }
+    .ped-columnas-seguimiento.con-mapa .ped-columna-mapa { grid-column: 1 / -1; }
+}
+@media (max-width: 768px) {
+    .ped-contenido { padding: 16px 16px 40px; }
+    .ped-titulo { font-size: 24px; }
+    .ped-columnas, .ped-columnas-seguimiento, .ped-columnas-seguimiento.con-mapa, .ped-columnas-carrito { grid-template-columns: minmax(0, 1fr); }
+    .ped-dos-tarjetas { grid-template-columns: 1fr; }
+    .public-navbar-links { display: none; }
+    .alert-toast-fijo { top: 70px; right: 16px; left: 16px; }
+
+    .ped-etapas { grid-template-columns: 1fr; gap: 14px; }
+    .ped-etapa { flex-direction: row; text-align: left; gap: 12px; }
+    .ped-etapa:not(:last-child)::after { top: 32px; left: 15px; width: 2px; height: calc(100% - 4px + 14px); }
+    .ped-etapa-hora { margin-left: auto; }
+
+    .ped-tabla { background: transparent; border: 0; }
+    .ped-tabla-cabecera { display: none; }
+    .ped-tabla-fila { grid-template-columns: 1fr auto; background: #fff; border: 1px solid #DDE7DF; border-radius: 14px; margin-bottom: 10px; padding: 14px; gap: 6px 10px; }
+    .ped-celda-fecha { grid-column: 1 / -1; order: 3; font-size: 13px; color: #68786F; }
+    .ped-celda-total { order: 2; }
+    .ped-celda-accion { grid-column: 1 / -1; order: 5; text-align: left; }
+    .ped-tabla-pie { flex-direction: column; }
+    .ped-carrito-item { align-items: flex-start; }
+    .ped-boton { width: 100%; }
+    .ped-confirmacion-botones .ped-boton, .ped-modal-botones .ped-boton { width: auto; }
+}
+
+/* Ajustes visuales */
+.ped-migas a { color: #20A34A; text-decoration: none; font-weight: 600; }
+.ped-carrito-fila > div:last-child, .ped-carrito-precio { display: flex; align-items: center; gap: 14px; }
+.ped-agregar-dir, .ped-tarjeta .ped-enlace-fuerte { color: #20A34A; }
+.ped-pestanas a:hover { color: #10271B; }

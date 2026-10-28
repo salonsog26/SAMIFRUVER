@@ -1,0 +1,999 @@
+/* src/styles/variables.css */
+
+/* --- LAYOUT GENERAL ADMINISTRADOR --- */
+.admin-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+}
+
+.admin-main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- SIDEBAR (MENÚ LATERAL) --- */
+.sidebar {
+    width: 260px;
+    background-color: #FAF7F2;
+    border-right: 1px solid #E6DEC9;
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.sidebar-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-logo-icon {
+    width: 36px;
+    height: 36px;
+    background-color: #2E7D32;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar-logo-inner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+}
+
+.sidebar-brand {
+    color: #2E7D32;
+    font-size: 18px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.menu-item-text {
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: #5D4037;
+}
+
+.menu-item.active {
+    background-color: #E8F5E9;
+}
+
+.menu-item.active .menu-item-text {
+    color: #2E7D32;
+    font-weight: 700;
+}
+
+.menu-icon-placeholder {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #8D6E63;
+}
+
+.menu-item.active .menu-icon-placeholder {
+    border-color: #2E7D32;
+}
+
+/* --- TOPBAR (BARRA SUPERIOR) --- */
+.topbar {
+    height: 72px;
+    background-color: white;
+    border-bottom: 1px solid #E6DEC9;
+    padding: 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar-title {
+    color: #8D6E63;
+    font-size: 14px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-role {
+    color: #3E2723;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+}
+
+.topbar-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* --- PÁGINA: CONSULTAR PRODUCTOS --- */
+.page-content {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    flex: 1;
+}
+
+.page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.page-title {
+    color: #3E2723;
+    font-size: 28px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    margin: 0;
+}
+
+.page-subtitle {
+    color: #8D6E63;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+.search-container {
+    width: 100%;
+    max-width: 640px;
+    height: 48px;
+    background-color: white;
+    border: 1px solid #E6DEC9;
+    border-radius: 8px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    color: #3E2723;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+}
+
+.search-icon-placeholder {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #8D6E63;
+}
+
+.empty-state {
+    padding: 80px 40px;
+    border: 1px solid #E6DEC9;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.empty-state-icon-bg {
+    width: 80px;
+    height: 80px;
+    background-color: #FAF7F2;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.empty-state-icon {
+    width: 31px;
+    height: 33px;
+    border: 2px solid #8D6E63;
+}
+
+.empty-state-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.empty-state-title {
+    color: #3E2723;
+    font-size: 18px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    margin: 0;
+}
+
+.empty-state-desc {
+    color: #8D6E63;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+/* --- FORMULARIO DE PRODUCTOS --- */
+.form-card {
+    width: 100%;
+    max-width: 640px;
+    padding: 32px;
+    background-color: white;
+    border-radius: 16px;
+    border: 1px solid #E6DEC9;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    color: #3E2723;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-input-wrapper {
+    height: 44px;
+    padding: 0 16px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #E6DEC9;
+    display: flex;
+    align-items: center;
+}
+
+.form-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    color: #3E2723;
+    font-size: 14px;
+}
+
+/* --- BOTONES --- */
+.button-group {
+    display: flex;
+    gap: 16px;
+    padding-top: 8px;
+}
+
+.btn-primary {
+    padding: 14px 24px;
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    padding: 14px 24px;
+    background-color: white;
+    color: #5D4037;
+    border: 1px solid #E6DEC9;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- ALERTAS FLOTANTES --- */
+.alert-toast {
+    position: absolute;
+    top: 24px;
+    right: 40px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.alert-success {
+    background-color: #E8F5E9;
+    border: 1.5px solid #2E7D32;
+    color: #1B5E20;
+}
+
+.alert-error {
+    background-color: #FFEBEE;
+    border: 1.5px solid #C62828;
+    color: #C62828;
+}
+
+/* --- ESTADOS DE ERROR EN FORMULARIOS --- */
+.form-input-wrapper.has-error {
+    background-color: #FFEBEE;
+    border: 1px solid #C62828;
+}
+
+.form-error-text {
+    color: #C62828;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* --- TABLA DE PRODUCTOS --- */
+.table-container {
+    width: 100%;
+    background: white;
+    border: 1px solid #E6DEC9;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-table-header {
+    display: flex;
+    background-color: #FAF7F2;
+    padding: 14px 24px;
+    border-bottom: 1px solid #E6DEC9;
+}
+
+.product-table-header .col-foto {
+    width: 80px;
+}
+
+.product-table-header .col-nombre {
+    flex: 1;
+}
+
+.product-table-header .col-stock {
+    width: 120px;
+}
+
+.product-table-header .col-precio {
+    width: 150px;
+}
+
+.table-header-text {
+    color: #8D6E63;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.product-table-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid #E6DEC9;
+}
+
+.product-table-row:last-child {
+    border-bottom: none;
+}
+
+.col-foto {
+    width: 80px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.col-nombre {
+    flex: 1;
+    color: #3E2723;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.col-stock {
+    width: 120px;
+    color: #5D4037;
+    font-size: 14px;
+}
+
+.col-precio {
+    width: 150px;
+    color: #2E7D32;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.product-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+/* --- DISEÑO VISTAS PÚBLICAS Y LOGIN --- */
+.auth-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    overflow: hidden;
+}
+
+.auth-hero-section {
+    width: 650px;
+    height: 100%;
+    padding: 56px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.auth-form-section {
+    flex: 1;
+    height: 100%;
+    padding: 62px 108px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.input-error {
+    background-color: #FFF1F0 !important;
+    border: 1.5px solid #D92D20 !important;
+}
+
+.error-text {
+    color: #D92D20;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- ALERTA DE ADVERTENCIA Y PLACEHOLDER DE ICONO --- */
+.alert-icon-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.alert-warning {
+    background-color: #FFF8E1;
+    border: 1.5px solid #F9A825;
+    color: #8D6E00;
+}
+
+/* --- BADGES DE CATEGORÍA --- */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    width: fit-content;
+}
+
+.badge-default {
+    background-color: #F1F1F1;
+    color: #5D4037;
+}
+
+.badge-verduras {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.badge-frutas {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+.badge-especias {
+    background-color: #FCE4EC;
+    color: #AD1457;
+}
+
+/* --- MODAL DE CONFIRMACIÓN --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(16, 39, 27, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 420px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0px 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.modal-title {
+    color: #3E2723;
+    font-size: 18px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    margin: 0;
+}
+
+.modal-text {
+    color: #5D4037;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 8px;
+}
+
+.btn-danger {
+    flex: 1;
+    padding: 14px 24px;
+    background-color: #C62828;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* --- CATÁLOGO PÚBLICO: PÁGINA Y NAVBAR --- */
+.public-page {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #FAFCF9;
+    display: flex;
+    flex-direction: column;
+}
+
+.public-navbar {
+    height: 76px;
+    padding: 0 40px;
+    background-color: white;
+    border-bottom: 1px solid #E6DEC9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.public-navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.public-navbar-logo {
+    width: 32px;
+    height: 32px;
+    background-color: #2E7D32;
+    border-radius: 8px;
+}
+
+.public-navbar-logo-inner {
+    width: 14px;
+    height: 14px;
+    margin: 9px;
+    border: 2px solid white;
+    border-radius: 3px;
+}
+
+.public-navbar-title {
+    color: #10271B;
+    font-size: 18px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+}
+
+.public-navbar-search {
+    flex: 1;
+    max-width: 420px;
+    height: 42px;
+    padding: 0 16px;
+    background-color: #F5F3EE;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.public-navbar-search-icon {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #8D6E63;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.public-navbar-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: #3E2723;
+}
+
+.public-navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.public-navbar-cart {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.public-navbar-cart-icon {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #3E2723;
+    border-radius: 3px;
+}
+
+.public-navbar-cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background-color: #2E7D32;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-outline {
+    height: 40px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    color: #3E2723;
+    border: 1px solid #E6DEC9;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-primary-nav {
+    height: 40px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* --- CATÁLOGO PÚBLICO: HERO --- */
+.public-hero {
+    position: relative;
+    margin: 32px 40px 0;
+    height: 340px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.public-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.public-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(10, 42, 22, 0.55) 0%, rgba(10, 42, 22, 0.15) 70%);
+}
+
+.public-hero-content {
+    position: absolute;
+    left: 40px;
+    bottom: 36px;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.public-hero-tag {
+    color: #C8E6C9;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-family: 'Inter', sans-serif;
+}
+
+.public-hero-title {
+    color: white;
+    font-size: 32px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* --- CATÁLOGO PÚBLICO: SECCIÓN DE PRODUCTOS --- */
+.public-products-section {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+}
+
+.public-products-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.public-products-title {
+    color: #3E2723;
+    font-size: 24px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    margin: 0 0 4px;
+}
+
+.public-products-subtitle {
+    color: #8D6E63;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+.public-products-link {
+    color: #2E7D32;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.public-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+/* --- TARJETA DE PRODUCTO --- */
+.product-card {
+    background-color: white;
+    border: 1px solid #E6DEC9;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card-image-wrapper {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+}
+
+.product-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.product-card-name {
+    color: #3E2723;
+    font-size: 16px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    margin: 0;
+}
+
+.product-card-price {
+    color: #2E7D32;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+}
+
+.product-card-unit {
+    color: #8D6E63;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.btn-primary-full {
+    width: 100%;
+    padding: 12px;
+    margin-top: 4px;
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+/* --- FOOTER PÚBLICO --- */
+.public-footer {
+    height: 88px;
+    padding: 0 64px;
+    background-color: #153324;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.public-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.public-footer-logo {
+    width: 38px;
+    height: 38px;
+    background-color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.public-footer-logo-inner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #20A34A;
+    border-radius: 3px;
+}
+
+.public-footer-title {
+    color: white;
+    font-size: 18px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+}
+
+.public-footer-copy,
+.public-footer-links {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- EXTENSIONES: CABECERA DE PÁGINA CON ACCIÓN Y TABLA DE GESTIÓN --- */
+.page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.btn-logout {
+    background-color: transparent;
+    border: 1px solid #E6DEC9;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    color: #3E2723;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.col-categoria {
+    width: 130px;
+    color: #8D6E63;
+    font-size: 14px;
+}
+
+.product-table-header .col-categoria {
+    width: 130px;
+}
+
+.col-acciones {
+    width: 170px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.product-table-header .col-acciones {
+    width: 170px;
+    text-align: right;
+}
+
+.btn-table-action {
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+.btn-table-edit {
+    background-color: #FFA726;
+}
+
+.btn-table-delete {
+    background-color: #E53935;
+}
