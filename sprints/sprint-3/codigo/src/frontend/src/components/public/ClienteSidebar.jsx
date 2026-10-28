@@ -1,0 +1,78 @@
+// src/components/public/ClienteSidebar.jsx — menú lateral del área "Mi cuenta" (cliente)
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { User, Package, MapPin, Heart, LogOut, X } from 'lucide-react';
+import logo from '../../assets/logo-samifruver.png';
+import { obtenerSesion, cerrarSesion } from '../../utils/auth';
+import { iniciales } from './Navbar';
+import useMenuLateral from '../../utils/useMenuLateral';
+import BarraMovil from '../admin/BarraMovil';
+import '../../styles/variables.css';
+
+// "Direcciones" y "Favoritos" aparecen en el diseño pero aún no tienen pantalla.
+const OPCIONES_PROXIMAMENTE = [
+    { texto: 'Direcciones', Icono: MapPin },
+    { texto: 'Favoritos', Icono: Heart }
+];
+
+function ClienteSidebar({ nombre }) {
+    const navigate = useNavigate();
+    const sesion = obtenerSesion();
+    const { abierto, abrir, cerrar } = useMenuLateral();
+    const nombreMostrado = nombre || sesion?.nombre || 'Cliente';
+
+    const salir = () => {
+        cerrarSesion();
+        navigate('/login');
+    };
+
+    return (
+        <>
+        <BarraMovil abierto={abierto} onAbrir={abrir} />
+        {abierto && <div className="sidebar-backdrop" onClick={cerrar} />}
+        <aside className={`sidebar${abierto ? ' abierto' : ''}`}>
+            <div className="sidebar-top">
+                <div className="sidebar-logo-container">
+                    <img src={logo} alt="Samifruver" style={{ height: 36, width: 'auto' }} />
+                    <button type="button" className="sidebar-cerrar" aria-label="Cerrar menú" onClick={cerrar}>
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <nav className="sidebar-menu">
+                    <span className="menu-item active" aria-current="page">
+                        <User className="menu-icon" size={18} />
+                        <span className="menu-item-text">Mi perfil</span>
+                    </span>
+                    <Link to="/pedidos" className="menu-item">
+                        <Package className="menu-icon" size={18} />
+                        <span className="menu-item-text">Mis pedidos</span>
+                    </Link>
+                    {OPCIONES_PROXIMAMENTE.map(({ texto, Icono }) => (
+                        <button key={texto} type="button" className="menu-item menu-item-boton" title="Próximamente" aria-disabled="true" onClick={(e) => e.preventDefault()}>
+                            <Icono className="menu-icon" size={18} />
+                            <span className="menu-item-text">{texto}</span>
+                        </button>
+                    ))}
+                </nav>
+            </div>
+
+            <div className="sidebar-user-block">
+                <div className="sidebar-user-info sidebar-user-card">
+                    <div className="sidebar-avatar">{iniciales(nombreMostrado)}</div>
+                    <div>
+                        <div className="sidebar-user-name">{nombreMostrado}</div>
+                        <div className="sidebar-user-role">Cliente</div>
+                    </div>
+                </div>
+                <button type="button" className="sidebar-logout" onClick={salir}>
+                    <LogOut size={18} />
+                    Cerrar sesión
+                </button>
+            </div>
+        </aside>
+        </>
+    );
+}
+
+export default ClienteSidebar;
