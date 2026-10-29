@@ -1,4 +1,4 @@
-Pruebas funcionales de la épica 2 Gestió de Usuario
+Pruebas funcionales de la épica 2 Gestión de Usuario
 
 Historia de Usuario 1: Registrar Usuario. https://docs.google.com/spreadsheets/d/1CE4K4ArGMhKUH9OGxfRpslS4X1Q6QMMPrK-KcpFELqs/edit?gid=0#gid=0
 
