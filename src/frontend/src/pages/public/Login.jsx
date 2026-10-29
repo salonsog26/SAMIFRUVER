@@ -51,7 +51,9 @@ function Login() {
         setCargando(false);
 
         if (resultado.ok) {
-            navigate(resultado.usuario.rol === 'admin' ? '/admin/productos' : '/');
+            // replace: true evita que el Login quede en el historial del navegador,
+            // así el botón "atrás" ya no puede volver a esta pantalla tras iniciar sesión.
+            navigate(resultado.usuario.rol === 'admin' ? '/admin/productos' : '/', { replace: true });
             return;
         }
         if (resultado.red) {

@@ -1,0 +1,60 @@
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/diego/SAMIFRUBER/src/frontend[39m
+
+ [32m✓[39m src/tests/utils.test.js[2m > [22mE2 validaciones de cliente (front)[2m > [22mregistro válido → sin errores
+ [32m✓[39m src/tests/utils.test.js[2m > [22mE2 validaciones de cliente (front)[2m > [22mel teléfono admite espacios entre dígitos pero no letras
+ [32m✓[39m src/tests/utils.test.js[2m > [22mE2 validaciones de cliente (front)[2m > [22mE2-HU2: validarCorreoLogin devuelve "Correo no válido" solo si el formato es incorrecto
+ [32m✓[39m src/tests/utils.test.js[2m > [22mE2 validaciones de cliente (front)[2m > [22mE2-HU3: documento, dirección y ciudad son opcionales pero se validan si vienen
+ [32m✓[39m src/tests/utils.test.js[2m > [22mE2 validaciones de cliente (front)[2m > [22mE2-HU3: validarPerfil no exige contraseña
+ [32m✓[39m src/tests/utils.test.js[2m > [22mSesión (localStorage)[2m > [22mguarda, lee y cierra sesión
+ [32m✓[39m src/tests/utils.test.js[2m > [22mSesión (localStorage)[2m > [22msesión corrupta se trata como sin sesión (no lanza error)
+ [32m✓[39m src/tests/utils.test.js[2m > [22mlogin() contra la API[2m > [22méxito: guarda la sesión con token y rol
+ [32m✓[39m src/tests/utils.test.js[2m > [22mlogin() contra la API[2m > [22mcredenciales incorrectas: no guarda sesión
+ [32m✓[39m src/tests/utils.test.js[2m > [22mlogin() contra la API[2m > [22msin conexión: devuelve error de red
+ [32m✓[39m src/tests/navbar.test.jsx[2m > [22mNavbar del catálogo (E2-HU2)[2m > [22msin sesión: muestra "Iniciar Sesión" y "Registrarse"
+ [32m✓[39m src/tests/navbar.test.jsx[2m > [22mNavbar del catálogo (E2-HU2)[2m > [22mcliente con sesión: muestra su nombre con iniciales, enlaza a /perfil y oculta los botones de acceso
+ [32m✓[39m src/tests/navbar.test.jsx[2m > [22mNavbar del catálogo (E2-HU2)[2m > [22madministrador con sesión: su enlace va al panel de productos
+ [32m✓[39m src/tests/navbar.test.jsx[2m > [22mNavbar del catálogo (E2-HU2)[2m > [22miniciales(): dos letras, tolera nombres vacíos o con espacios
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU2 Carrito y creación de pedido[2m > [22mcarrito vacío: muestra el estado vacío y no deja realizar pedido
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU2 Carrito y creación de pedido[2m > [22magregar: el límite de stock no deja pasar de las unidades disponibles
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mConsultar productos (E1-HU3)[2m > [22mE1-HU3 ESC1: búsqueda sin resultados → "No existen coincidencias en el catálogo"[33m 471[2mms[22m[39m
+ [32m✓[39m src/tests/perfil.test.jsx[2m > [22mEditar perfil (E2-HU3)[2m > [22mE2-HU3 ESC1: campos obligatorios vacíos → "Este campo es obligatorio" y no envía[33m 601[2mms[22m[39m
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU2 Carrito y creación de pedido[2m > [22msin método de pago: muestra el error y no llama al servidor
+ [32m✓[39m src/tests/auth-ui.test.jsx[2m > [22mLogin (E1-HU4 administrador y E2-HU2 cliente)[2m > [22mE1-HU4 ESC1 / E2-HU2 ESC1: datos incorrectos → mensaje genérico, sin sesión, se queda en /login[33m 756[2mms[22m[39m
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mConsultar productos (E1-HU3)[2m > [22mE1-HU3 ESC2: búsqueda encontrada (sin importar mayúsculas)
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU2 Carrito y creación de pedido[2m > [22mpedido exitoso: envía el pedido con el header del cliente, vacía el carrito y va a la confirmación
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU2 Carrito y creación de pedido[2m > [22mquitar un producto lo elimina del carrito
+ [32m✓[39m src/tests/perfil.test.jsx[2m > [22mEditar perfil (E2-HU3)[2m > [22mE2-HU3 ESC2: correo de otro cliente → aviso del servidor y la sesión no cambia[33m 497[2mms[22m[39m
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU2 Carrito y creación de pedido[2m > [22merror 409 de stock se muestra y el carrito se conserva
+ [32m✓[39m src/tests/perfil.test.jsx[2m > [22mEditar perfil (E2-HU3)[2m > [22mE2-HU3 ESC3: cancelar sin cambios → vuelve a la pantalla principal sin confirmar
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mConfirmación del pedido[2m > [22mmuestra el número y los botones
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU3 Historial de pedidos[2m > [22msin pedidos: estado vacío con "Ir a Inicio"
+ [32m✓[39m src/tests/perfil.test.jsx[2m > [22mEditar perfil (E2-HU3)[2m > [22mE2-HU3 ESC4: guardar sin cambios → "No se ha realizado ningún cambio" y no llama al servidor
+ [32m✓[39m src/tests/auth-ui.test.jsx[2m > [22mLogin (E1-HU4 administrador y E2-HU2 cliente)[2m > [22mE1-HU4 ESC2: admin correcto → /admin/productos y sesión admin guardada[33m 622[2mms[22m[39m
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mRegistrar producto (E1-HU1)[2m > [22mE1-HU1 ESC1: producto duplicado → "El producto ya existe" y no llama al servidor[33m 642[2mms[22m[39m
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mRegistrar producto (E1-HU1)[2m > [22mE1-HU1 ESC3: formulario vacío → botón gris y deshabilitado
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU3 Historial de pedidos[2m > [22mlista, filtra por estado y abre el detalle
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22mpreparación: aviso de preparación y cancelar habilitado
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22men camino: muestra repartidor, mapa ilustrativo y bloquea la cancelación
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22mentregado: banner de entrega y cancelar deshabilitado
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mActualizar producto (E1-HU2)[2m > [22mE1-HU2 ESC1: cambios válidos → PUT y vuelve al listado con alerta de éxito[33m 300[2mms[22m[39m
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22mESC1: cancelar con confirmación muestra "Pedido cancelado correctamente"
+ [32m✓[39m src/tests/perfil.test.jsx[2m > [22mEditar perfil (E2-HU3)[2m > [22mE2-HU3 ESC5: salir con cambios → modal de advertencia; "Cancelar" mantiene la edición y "Aceptar" descarta[33m 545[2mms[22m[39m
+ [32m✓[39m src/tests/auth-ui.test.jsx[2m > [22mLogin (E1-HU4 administrador y E2-HU2 cliente)[2m > [22mE2-HU2 ESC2: cliente correcto → pantalla principal[33m 532[2mms[22m[39m
+ [32m✓[39m src/tests/auth-ui.test.jsx[2m > [22mLogin (E1-HU4 administrador y E2-HU2 cliente)[2m > [22mE2-HU2 ESC3: sin datos → botón deshabilitado
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22m"Volver" cierra la ventana sin cancelar
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mActualizar producto (E1-HU2)[2m > [22mE1-HU2 ESC2: cancelar con cambios → pide confirmación de descarte
+ [32m✓[39m src/tests/admin-ui.test.jsx[2m > [22mActualizar producto (E1-HU2)[2m > [22mE1-HU2 ESC3: guardar sin modificaciones → advertencia y no llama al servidor
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22mESC3: si falla la conexión muestra el error y permite reintentar
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mE3-HU1 Seguimiento y E3-HU4 Cancelación[2m > [22mpedido inexistente: muestra "Pedido no encontrado"
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mCatálogo y navbar con carrito[2m > [22mProductCard agotado deshabilita el botón
+ [32m✓[39m src/tests/pedidos-ui.test.jsx[2m > [22mCatálogo y navbar con carrito[2m > [22mla navbar del cliente muestra "Mis pedidos" y la cantidad del carrito
+ [32m✓[39m src/tests/perfil.test.jsx[2m > [22mEditar perfil (E2-HU3)[2m > [22mE2-HU3 ESC6: guardado exitoso → "Cambios guardados correctamente", envía los 6 campos y actualiza la sesión[33m 505[2mms[22m[39m
+ [32m✓[39m src/tests/auth-ui.test.jsx[2m > [22mRegistro de cliente (E2-HU1)[2m > [22mE2-HU1 ESC1: usuario ya registrado → "El usuario ya existe"[33m 991[2mms[22m[39m
+ [32m✓[39m src/tests/auth-ui.test.jsx[2m > [22mRegistro de cliente (E2-HU1)[2m > [22mE2-HU1 ESC2: registro exitoso → "Registro exitoso" y luego va a /login[33m 2477[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[32m51 passed[39m[22m[90m (51)[39m
+[2m   Start at [22m 13:42:03
+[2m   Duration [22m 9.49s[2m (transform 1.56s, setup 3.07s, collect 4.85s, tests 12.40s, environment 9.33s, prepare 2.13s)[22m
+

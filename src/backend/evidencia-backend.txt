@@ -1,0 +1,84 @@
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/diego/SAMIFRUBER/src/backend[39m
+
+ [32m✓[39m tests/clientes.test.js[2m > [22mE2-HU1 Registro de cliente (API)[2m > [22mE2-HU1 ESC1: correo ya registrado (aunque cambie mayúsculas) → 409 "El usuario ya existe"[33m 838[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC1: producto duplicado (sin importar mayúsculas/espacios) → 409[33m 852[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mESC1: pedido creado → 201, descuenta el stock y calcula subtotal, domicilio y total[33m 889[2mms[22m[39m
+ [32m✓[39m tests/auth.test.js[2m > [22mE1-HU4 Login de administrador (API)[2m > [22mE1-HU4 ESC1: credenciales incorrectas → 401 con mensaje genérico[33m 947[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mel primer estado ya tiene la hora de "Pedido recibido" y las demás etapas pendientes[33m 392[2mms[22m[39m
+ [32m✓[39m tests/clientes.test.js[2m > [22mE2-HU1 Registro de cliente (API)[2m > [22mE2-HU1 ESC2: registro exitoso → 201 "Registro exitoso", sin contraseña en la respuesta[33m 474[2mms[22m[39m
+ [32m✓[39m tests/auth.test.js[2m > [22mE1-HU4 Login de administrador (API)[2m > [22mE1-HU4 ESC2: credenciales correctas → 200, token y rol admin[33m 463[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mel mismo producto repetido en el carrito se suma en una sola línea[33m 379[2mms[22m[39m
+ [32m✓[39m tests/clientes.test.js[2m > [22mE2-HU3 Editar perfil (API)[2m > [22mE2-HU3 ESC1: campos obligatorios vacíos → 400[33m 365[2mms[22m[39m
+ [32m✓[39m tests/auth.test.js[2m > [22mE2-HU2 Login de cliente (API)[2m > [22mE2-HU2 ESC1: datos incorrectos → 401[33m 461[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mtambién acepta Mercado Pago[33m 364[2mms[22m[39m
+ [32m✓[39m tests/clientes.test.js[2m > [22mE2-HU3 Editar perfil (API)[2m > [22mE2-HU3 ESC2: correo de otro usuario → 409 con el mensaje del diseño y no modifica[33m 362[2mms[22m[39m
+ [32m✓[39m tests/auth.test.js[2m > [22mE2-HU2 Login de cliente (API)[2m > [22mE2-HU2 ESC2: datos correctos → 200, token y sin contraseña en la respuesta[33m 425[2mms[22m[39m
+ [32m✓[39m tests/auth.test.js[2m > [22mE2-HU2 Login de cliente (API)[2m > [22mE2-HU2 ESC3: sin datos → 401[33m 343[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mESC2: carrito vacío → 400 y no crea nada[33m 372[2mms[22m[39m
+ [32m✓[39m tests/clientes.test.js[2m > [22mE2-HU3 Editar perfil (API)[2m > [22mE2-HU3 ESC4: guardar sin cambios → "No se ha realizado ningún cambio"[33m 351[2mms[22m[39m
+ [32m✓[39m tests/clientes.test.js[2m > [22mE2-HU3 Editar perfil (API)[2m > [22mE2-HU3 ESC6: guardado exitoso → "Cambios guardados correctamente" y se persiste[33m 388[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mESC3: sin método de pago → 400 "Selección de método de pago es obligatorio" y no descuenta stock[33m 375[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mESC4: cantidad mayor al stock → 409 con las unidades disponibles y no se descuenta nada[33m 374[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mse puede comprar justo todo el stock disponible[33m 346[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mproducto inexistente → 400[33m 312[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (nombre vacío) → 400 y no guarda[33m 385[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (nombre solo espacios) → 400 y no guarda[33m 369[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (nombre de 1 carácter) → 400 y no guarda[33m 348[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (nombre con símbolos) → 400 y no guarda[33m 357[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (nombre de 61 caracteres) → 400 y no guarda[33m 361[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (nombre no es texto) → 400 y no guarda[33m 369[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (precio vacío) → 400 y no guarda[33m 315[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (precio cero) → 400 y no guarda[33m 321[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (precio negativo) → 400 y no guarda[33m 338[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (precio no numérico) → 400 y no guarda[33m 318[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (categoría vacía) → 400 y no guarda[33m 319[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (categoría fuera de la lista) → 400 y no guarda[33m 358[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (cantidad 0) → 400[33m 327[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (cantidad negativa) → 400[33m 321[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (cantidad decimal) → 400[33m 352[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (cantidad texto) → 400[33m 370[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (stock negativo) → 400 y no guarda[33m 387[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (stock no numérico) → 400 y no guarda[33m 345[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU1 Registrar producto (API)[2m > [22mE1-HU1 ESC3: campos inválidos (unidad inválida) → 400 y no guarda[33m 393[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (cantidad enorme) → 400[33m 341[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (productoId inválido) → 400[33m 346[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mitem inválido (sin productoId) → 400[33m 398[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22msin dirección → 400 "Selecciona o agrega una dirección de entrega."[33m 396[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU3 Consultar productos (API)[2m > [22mE1-HU3 ESC1: con la base vacía devuelve lista vacía[33m 443[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU3 Consultar productos (API)[2m > [22mE1-HU3 ESC2: lista los productos existentes[33m 383[2mms[22m[39m
+ [32m✓[39m tests/productos.test.js[2m > [22mE1-HU2 Actualizar producto (API)[2m > [22mE1-HU2 ESC1: cambios válidos → 200 y se persisten[33m 467[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mdirección vacía → 400 "Selecciona o agrega una dirección de entrega."[33m 420[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22msin ciudad → 400 "Selecciona o agrega una dirección de entrega."[33m 422[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mlínea muy corta → 400 "Selecciona o agrega una dirección de entrega."[33m 315[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mteléfono de entrega inválido → 400; si no se envía usa el del cliente[33m 355[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22msin sesión o con cliente inexistente → 401[33m 343[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22mel precio guardado en el pedido no cambia si luego se edita el producto[33m 384[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU2 Crear pedido[2m > [22msi el producto se elimina, el pedido conserva su nombre y precio[33m 324[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU3 Historial de pedidos[2m > [22mESC2: sin pedidos → lista vacía[33m 318[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU3 Historial de pedidos[2m > [22mESC1: lista los pedidos del cliente, del más reciente al más antiguo, con número, fecha y total[33m 390[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU3 Historial de pedidos[2m > [22mun cliente no ve los pedidos de otro[33m 381[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU3 Historial de pedidos[2m > [22mfiltra por estado y total sigue contando todos[33m 391[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU3 Historial de pedidos[2m > [22msin sesión → 401[33m 319[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU1 Consultar pedido (seguimiento)[2m > [22mdevuelve el detalle completo del pedido[33m 352[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU1 Consultar pedido (seguimiento)[2m > [22mpedido de otro cliente, inexistente o con id inválido → 404[33m 347[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU1 Consultar pedido (seguimiento)[2m > [22mESC1: "En preparación" sin repartidor → etapas 1 y 2 completas, 3 y 4 pendientes[33m 341[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU1 Consultar pedido (seguimiento)[2m > [22mESC2: "En camino" → repartidor asignado y ventana de llegada estimada[33m 372[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU1 Consultar pedido (seguimiento)[2m > [22mESC3: "Entregado" → las 4 etapas con hora[33m 398[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU4 Cancelar pedido[2m > [22mESC1: cancela un pedido recibido → devuelve el stock, marca la devolución y queda "cancelado"[33m 345[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU4 Cancelar pedido[2m > [22mtambién se puede cancelar "En preparación"[33m 332[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU4 Cancelar pedido[2m > [22mESC2: "En camino" o "Entregado" → 409 y el pedido no cambia[33m 380[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU4 Cancelar pedido[2m > [22mcancelar dos veces no devuelve el stock dos veces[33m 358[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU4 Cancelar pedido[2m > [22mno se puede cancelar el pedido de otro cliente ni uno inexistente → 404[33m 350[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mE3-HU4 Cancelar pedido[2m > [22msin sesión → 401[33m 304[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mAvanzar estado (provisional, hasta las Épicas 5 y 6)[2m > [22msin ADMIN_KEY configurada → 403 (función deshabilitada)[33m 301[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mAvanzar estado (provisional, hasta las Épicas 5 y 6)[2m > [22mcon clave incorrecta o ausente → 403[33m 331[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mAvanzar estado (provisional, hasta las Épicas 5 y 6)[2m > [22mrecorre recibido → preparacion → en_camino → entregado y luego responde 409[33m 347[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mAvanzar estado (provisional, hasta las Épicas 5 y 6)[2m > [22mun pedido cancelado no puede avanzar; uno inexistente → 404[33m 337[2mms[22m[39m
+ [32m✓[39m tests/pedidos.test.js[2m > [22mAvanzar estado (provisional, hasta las Épicas 5 y 6)[2m > [22mpermite indicar el repartidor al pasar a "en_camino"[33m 360[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (5)[39m
+[2m      Tests [22m [1m[32m75 passed[39m[22m[2m | [22m[33m4 skipped[39m[90m (79)[39m
+[2m   Start at [22m 13:42:39
+[2m   Duration [22m 18.12s[2m (transform 248ms, setup 0ms, collect 3.00s, tests 29.43s, environment 2ms, prepare 1.61s)[22m
+

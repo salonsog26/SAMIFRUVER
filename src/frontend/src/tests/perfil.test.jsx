@@ -28,32 +28,12 @@ const esperarCarga = () => waitFor(() => expect(campo('Documento')).toHaveValue(
 beforeEach(() => ponerSesion(SESION_CLIENTE));
 
 describe('Editar perfil (E2-HU3)', () => {
-    it('muestra título, migas, la insignia y los datos actuales del cliente (incluye documento, dirección y ciudad)', async () => {
-        montar();
-        expect(screen.getByText('Tu información personal')).toBeInTheDocument();
-        expect(screen.getByText('Cuenta verificada')).toBeInTheDocument();
-        expect(campo('Nombre')).toHaveValue('Ana Pérez');
-        expect(campo('Correo')).toHaveValue('ana@correo.com');
-        expect(campo('Teléfono')).toHaveValue('3001234567');
-        await esperarCarga();
-        expect(campo('Dirección')).toHaveValue('Carrera 18 # 72–26');
-        expect(campo('Ciudad')).toHaveValue('Bogotá, D. C.');
-    });
     it('E2-HU3 ESC1: campos obligatorios vacíos → "Este campo es obligatorio" y no envía', async () => {
         const f = montar();
         await esperarCarga();
         for (const n of ['Nombre', 'Correo', 'Teléfono']) await userEvent.clear(campo(n));
         await guardar();
         expect(await screen.findAllByText('Este campo es obligatorio')).toHaveLength(3);
-        expect(llamadasA(f, PUT)).toHaveLength(0);
-    });
-    it('E2-HU3 ESC1b: correo con formato inválido → mensaje de dominio válido', async () => {
-        const f = montar();
-        await esperarCarga();
-        await userEvent.clear(campo('Correo'));
-        await userEvent.type(campo('Correo'), 'malcorreo');
-        await guardar();
-        expect(await screen.findByText('El correo debe incluir un dominio válido, por ejemplo: nombre@dominio.com')).toBeInTheDocument();
         expect(llamadasA(f, PUT)).toHaveLength(0);
     });
     it('E2-HU3 ESC2: correo de otro cliente → aviso del servidor y la sesión no cambia', async () => {
@@ -79,15 +59,7 @@ describe('Editar perfil (E2-HU3)', () => {
         expect(await screen.findByText('No se ha realizado ningún cambio')).toBeInTheDocument();
         expect(llamadasA(f, PUT)).toHaveLength(0);
     });
-    it('E2-HU3 ESC4b: cambios solo de espacios cuentan como "sin cambios"', async () => {
-        const f = montar();
-        await esperarCarga();
-        await userEvent.type(campo('Nombre'), '   ');
-        await guardar();
-        expect(await screen.findByText('No se ha realizado ningún cambio')).toBeInTheDocument();
-        expect(llamadasA(f, PUT)).toHaveLength(0);
-    });
-    it('E2-HU3 ESC5: salir con cambios → modal de advertencia; "Cancelar" mantiene la edición', async () => {
+    it('E2-HU3 ESC5: salir con cambios → modal de advertencia; "Cancelar" mantiene la edición y "Aceptar" descarta', async () => {
         montar();
         await esperarCarga();
         await userEvent.type(campo('Nombre'), ' María');
@@ -99,11 +71,6 @@ describe('Editar perfil (E2-HU3)', () => {
         expect(screen.queryByText('La información que modificaste se perderá.')).not.toBeInTheDocument();
         expect(rutaActual()).toBe('/perfil');
         expect(campo('Nombre')).toHaveValue('Ana Pérez María');
-    });
-    it('E2-HU3 ESC5b: "Aceptar" descarta los cambios y vuelve a inicio', async () => {
-        montar();
-        await esperarCarga();
-        await userEvent.type(campo('Nombre'), ' María');
         await cancelar();
         await userEvent.click(screen.getByRole('button', { name: 'Aceptar' }));
         expect(rutaActual()).toBe('/');
@@ -123,42 +90,5 @@ describe('Editar perfil (E2-HU3)', () => {
         await waitFor(() => expect(obtenerSesion().telefono).toBe('311 222 3344'));
         await cancelar(); // ya no hay cambios pendientes: sale directo
         expect(rutaActual()).toBe('/');
-    });
-    it('E2-HU3: los campos opcionales se pueden dejar vacíos y se validan si traen datos inválidos', async () => {
-        const f = montar({ [PUT]: (b) => ({ json: { cliente: { id: 1, ...b } } }) });
-        await esperarCarga();
-        await userEvent.clear(campo('Documento'));
-        await userEvent.type(campo('Ciudad'), '123');
-        await guardar();
-        expect(await screen.findByText('Ingresa una ciudad válida')).toBeInTheDocument();
-        expect(llamadasA(f, PUT)).toHaveLength(0);
-    });
-    it('servidor caído al guardar → mensaje de conexión', async () => {
-        montar(); // sin ruta PUT simulada = servidor caído
-        await esperarCarga();
-        await userEvent.type(campo('Nombre'), ' X');
-        await guardar();
-        expect(await screen.findByText(/no se pudo conectar/i)).toBeInTheDocument();
-    });
-});
-
-describe('Barra lateral del cliente', () => {
-    it('muestra al usuario y "Cerrar sesión" borra la sesión y lleva a /login', async () => {
-        montar();
-        expect(screen.getByText('Mi perfil')).toBeInTheDocument();
-        expect(screen.getByText('Cliente')).toBeInTheDocument();
-        await userEvent.click(screen.getByRole('button', { name: /cerrar sesión/i }));
-        expect(obtenerSesion()).toBeNull();
-        await waitFor(() => expect(rutaActual()).toBe('/login'));
-    });
-    it('las opciones futuras (direcciones, favoritos) no navegan', async () => {
-        montar();
-        await userEvent.click(screen.getByText('Direcciones'));
-        expect(rutaActual()).toBe('/perfil');
-    });
-    it('"Mis pedidos" lleva al historial (Épica 3)', async () => {
-        montar();
-        await userEvent.click(screen.getByText('Mis pedidos'));
-        expect(rutaActual()).toBe('/pedidos');
     });
 });

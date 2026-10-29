@@ -6,11 +6,11 @@ const passwords = require('../lib/passwords');
 
 const MSJ_YA_EXISTE = 'El usuario ya existe';
 const MSJ_CORREO_AJENO = 'El correo le pertenece a otro cliente ya existe';
+const MSJ_DOCUMENTO_AJENO = 'El documento le pertenece a otro cliente ya existe';
 const MSJ_INCORRECTO = 'La información de inicio de sesión que ingresaste es incorrecta.';
 
 const COLUMNAS_PUBLICAS = 'id, nombre, correo, telefono, documento, direccion, ciudad';
 
-// Nunca se devuelve el hash de la contraseña. Los campos opcionales salen vacíos si no se han llenado.
 const publico = (fila) => ({
     id: fila.id,
     nombre: fila.nombre,
@@ -51,7 +51,6 @@ const registrarCliente = asincrono(async (req, res) => {
         );
         res.status(201).json({ mensaje: 'Registro exitoso', cliente: publico(rows[0]) });
     } catch (error) {
-        // Dos registros simultáneos con el mismo correo: lo frena el índice único.
         if (esDuplicado(error)) return res.status(409).json({ mensaje: MSJ_YA_EXISTE, errores: { correo: MSJ_YA_EXISTE } });
         throw error;
     }
@@ -97,21 +96,27 @@ const actualizarCliente = asincrono(async (req, res) => {
         nombre: limpiarEspacios(body.nombre),
         correo: body.correo.trim().toLowerCase(),
         telefono: limpiarEspacios(body.telefono),
-        // Si el campo opcional no viene en la petición, se conserva el valor actual.
         documento: body.documento === undefined ? actual.documento : limpiarEspacios(body.documento),
         direccion: body.direccion === undefined ? actual.direccion : limpiarEspacios(body.direccion),
         ciudad: body.ciudad === undefined ? actual.ciudad : limpiarEspacios(body.ciudad)
     };
 
-    // Escenario: el correo ya pertenece a otro usuario
-    const ajeno = await query('SELECT 1 FROM clientes WHERE LOWER(correo) = $1 AND id <> $2', [nuevo.correo, id]);
-    if (ajeno.rows.length > 0) {
+    // Escenario: el correo ya pertenece a otro cliente
+    const correoAjeno = await query('SELECT 1 FROM clientes WHERE LOWER(correo) = $1 AND id <> $2', [nuevo.correo, id]);
+    if (correoAjeno.rows.length > 0) {
         return res.status(409).json({ mensaje: MSJ_CORREO_AJENO, errores: { correo: MSJ_CORREO_AJENO } });
+    }
+
+    // Escenario: el documento ya pertenece a otro cliente
+    if (nuevo.documento) {
+        const documentoAjeno = await query('SELECT 1 FROM clientes WHERE documento = $1 AND id <> $2', [nuevo.documento, id]);
+        if (documentoAjeno.rows.length > 0) {
+            return res.status(409).json({ mensaje: MSJ_DOCUMENTO_AJENO, errores: { documento: MSJ_DOCUMENTO_AJENO } });
+        }
     }
 
     const sinCambios = Object.keys(nuevo).every((k) => (k === 'correo' ? actual.correo.toLowerCase() : actual[k]) === nuevo[k]);
     if (sinCambios) {
-        // Escenario: guardar sin cambios
         return res.json({ mensaje: 'No se ha realizado ningún cambio', cambios: false, cliente: actual });
     }
 

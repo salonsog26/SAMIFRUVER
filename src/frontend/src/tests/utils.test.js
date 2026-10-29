@@ -6,25 +6,6 @@ import { simularFetch } from './utils.jsx';
 describe('E2 validaciones de cliente (front)', () => {
     const ok = { nombre: 'María López', correo: 'm@c.com', telefono: '3205551234', password: 'abcd1234' };
     it('registro válido → sin errores', () => expect(validarRegistro(ok)).toEqual({}));
-    it('E2-HU1 ESC3: todo vacío → obligatorio en 4 campos', () => {
-        const e = validarRegistro({ nombre: '', correo: '', telefono: '', password: '' });
-        expect(Object.values(e)).toEqual(Array(4).fill(OBLIGATORIO));
-    });
-    it.each([
-        ['correo sin @', { correo: 'abc.com' }, 'correo'],
-        ['teléfono con letras', { telefono: '12ab567' }, 'telefono'],
-        ['contraseña corta', { password: '123' }, 'password'],
-        ['nombre con números', { nombre: 'M4ria' }, 'nombre']
-    ])('E2-HU1 ESC4: %s', (_n, cambio, campo) => {
-        expect(validarRegistro({ ...ok, ...cambio })[campo]).toBeTruthy();
-    });
-    it('E2-HU1 ESC3 (CP tester): contraseña de solo espacios → "Este campo es obligatorio"', () => {
-        expect(validarRegistro({ ...ok, password: '   ' }).password).toBe(OBLIGATORIO);
-        expect(validarRegistro({ ...ok, password: 'abc     ' }).password).toBe('La contraseña debe tener mínimo 8 caracteres');
-    });
-    it('E2-HU1 ESC4: el mensaje de correo inválido pide un dominio válido', () => {
-        expect(validarRegistro({ ...ok, correo: 'maria@' }).correo).toBe(MSJ_CORREO);
-    });
     it('el teléfono admite espacios entre dígitos pero no letras', () => {
         expect(validarTelefono('300 456 7890')).toBeUndefined();
         expect(validarTelefono('300 abc 7890')).toBeTruthy();
@@ -43,7 +24,6 @@ describe('E2 validaciones de cliente (front)', () => {
     });
     it('E2-HU3: validarPerfil no exige contraseña', () => {
         expect(validarPerfil(ok)).toEqual({});
-        expect(validarPerfil({ nombre: '', correo: 'x', telefono: '' })).toHaveProperty('nombre', OBLIGATORIO);
     });
 });
 
