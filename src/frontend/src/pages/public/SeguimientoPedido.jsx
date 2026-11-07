@@ -4,7 +4,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MapPin, TriangleAlert, X, Bike, PackageCheck, Check } from 'lucide-react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
-import { Franja, InsigniaEstado, LineaSeguimiento, ListaProductos } from '../../components/pedidos/Estados';
+import { Franja, FranjaPago, InsigniaEstado, LineaSeguimiento, ListaProductos, ResumenPago } from '../../components/pedidos/Estados';
 import {
     obtenerPedido, cancelarPedido, formatoCOP, resumenCantidades, fechaLarga, fechaLargaHora, fechaCorta,
     fechaHoraCorta, hora, diaMes, minutosRestantes, etiquetaEstado
@@ -64,6 +64,15 @@ function ResumenCompra({ pedido, children }) {
     );
 }
 
+// Línea de pago de "Detalles de entrega" según el estado real del pago (E4).
+const textoPago = (pedido) => {
+    const e = pedido.pago?.estado;
+    if (e === 'pendiente') return 'Pago en efectivo al recibir · Pendiente';
+    if (e === 'aprobado' && pedido.metodoPago === 'efectivo') return 'Pagado en efectivo al recibir';
+    if (e === 'aprobado') return `Pagado con ${pedido.pagoDetalle}`;
+    return `${pedido.pagoDetalle} · ${pedido.pago?.etiqueta || ''}`.trim();
+};
+
 function DetallesEntrega({ pedido }) {
     const d = pedido.direccion;
     return (
@@ -77,7 +86,7 @@ function DetallesEntrega({ pedido }) {
                     <span>{d.ciudad}{d.telefono ? ` · ${d.telefono}` : ''}</span>
                 </div>
             </div>
-            <p className="ped-entrega-pago">{pedido.metodoPago === 'tarjeta' ? `Pagado con ${pedido.pagoDetalle}` : 'Pagado con Mercado Pago'}</p>
+            <p className="ped-entrega-pago">{textoPago(pedido)}</p>
         </section>
     );
 }
@@ -91,7 +100,7 @@ function ModalCancelar({ pedido, error, enviando, onVolver, onConfirmar }) {
                 <span className="ped-modal-icono" aria-hidden="true"><TriangleAlert size={26} /></span>
                 <h2 id="ped-modal-titulo" className="ped-modal-titulo">¿Cancelar pedido?</h2>
                 <p className="modal-text">¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer</p>
-                <p className="ped-modal-pedido">Pedido #{pedido.numero} · Total pagado: {formatoCOP(pedido.total)}</p>
+                <p className="ped-modal-pedido">Pedido #{pedido.numero} · {pedido.pago?.estado === 'pendiente' ? 'Total a pagar' : 'Total pagado'}: {formatoCOP(pedido.total)}</p>
                 {error && (
                     <>
                         <Franja tipo="error">{error.mensaje}</Franja>
@@ -181,7 +190,7 @@ function SeguimientoPedido() {
 
     // ---------------------------------------------------------- pedido cancelado (detalle)
     if (estado === 'cancelado') {
-        const medio = pedido.metodoPago === 'tarjeta' ? `a tu tarjeta ${pedido.pagoDetalle}` : 'a tu cuenta de Mercado Pago';
+        const medio = `a tu tarjeta (${pedido.pagoDetalle})`;
         return (
             <div className="public-page ped-pagina">
                 <Navbar />
@@ -195,10 +204,11 @@ function SeguimientoPedido() {
                     <div className="ped-columnas ped-columnas-carrito">
                         <div className="ped-columna-principal">
                             <Franja tipo="exito">{MSJ_CANCELADO}</Franja>
+                            <FranjaPago pedido={pedido} />
                             {pedido.devolucionIniciada && (
                                 <section className="ped-tarjeta" aria-label="Devolución">
                                     <h2 className="ped-tarjeta-titulo ped-titulo-medio">Devolución iniciada</h2>
-                                    <p className="ped-texto">Iniciamos la devolución de {formatoCOP(pedido.total)} COP {medio}. El abono está pendiente y depende de los plazos de tu banco.</p>
+                                    <p className="ped-texto">Iniciamos la devolución de {formatoCOP(pedido.total)} COP {medio}. El abono está pendiente y depende de los plazos de tu banco.{pedido.pago?.devolucion?.referencia ? ` Referencia ${pedido.pago.devolucion.referencia}.` : ''}</p>
                                     <p className="ped-texto-ok"><Check size={16} aria-hidden="true" /> Las unidades del pedido se restituyeron al inventario.</p>
                                 </section>
                             )}
@@ -218,10 +228,11 @@ function SeguimientoPedido() {
                             <section className="ped-tarjeta ped-resumen">
                                 <h2 className="ped-tarjeta-titulo ped-titulo-medio">Pedido #{pedido.numero}</h2>
                                 <p className="ped-resumen-cantidades">{fechaLarga(pedido.creadoEn)} · Cancelado a las {hora(pedido.canceladoEn)}</p>
-                                <p className="ped-resumen-etiqueta">Total pagado</p>
+                                <p className="ped-resumen-etiqueta">{pedido.pago?.estado === 'anulado' ? 'Total del pedido' : 'Total pagado'}</p>
                                 <strong className="ped-resumen-grande">{formatoCOP(pedido.total)}</strong>
                                 <p className="ped-resumen-cantidades">{pedido.pagoDetalle}{pedido.devolucionIniciada ? ' · Devolución iniciada' : ''}</p>
                             </section>
+                            <ResumenPago pedido={pedido} compacto />
                             <Link to="/pedidos" className="ped-boton ped-boton-primario ped-boton-bloque">Ver historial de pedidos</Link>
                             <Link to="/" className="ped-boton ped-boton-secundario ped-boton-bloque">Seguir comprando</Link>
                         </aside>
@@ -273,6 +284,7 @@ function SeguimientoPedido() {
 
                 {AVISOS[estado] && <Franja tipo="info">{AVISOS[estado]}</Franja>}
                 {!puedeCancelar && <Franja tipo="info">{MSJ_NO_CANCELABLE}</Franja>}
+                <FranjaPago pedido={pedido} />
 
                 {entregado && (
                     <div className="ped-entregado-banda">
@@ -316,6 +328,7 @@ function SeguimientoPedido() {
                     )}
                     <aside className="ped-columna-lateral">
                         <ResumenCompra pedido={pedido} />
+                        <ResumenPago pedido={pedido} compacto />
                         {botonCancelar}
                         {entregado
                             ? <Link to="/" className="ped-boton ped-boton-primario ped-boton-bloque">Seguir comprando</Link>

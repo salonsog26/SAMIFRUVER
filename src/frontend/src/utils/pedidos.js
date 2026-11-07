@@ -68,7 +68,7 @@ const cabeceras = (extra = {}) => {
 };
 
 // Devuelve { ok, status, data, red? } sin lanzar errores: las pantallas deciden qué mensaje mostrar.
-async function pedir(ruta, opciones = {}) {
+export async function pedir(ruta, opciones = {}) {
     try {
         const respuesta = await fetch(`${API_URL}${ruta}`, { ...opciones, headers: cabeceras(opciones.headers) });
         let data = {};
@@ -78,6 +78,17 @@ async function pedir(ruta, opciones = {}) {
         return { ok: false, status: 0, red: true, data: {}, mensaje: 'No se pudo conectar con el servidor. Intenta de nuevo.' };
     }
 }
+
+// Estado del pago de un pedido (Épica 4): etiqueta y color de la insignia.
+export const ESTADOS_PAGO = {
+    pendiente: { etiqueta: 'Pendiente', tono: 'ambar' },
+    aprobado: { etiqueta: 'Aprobado', tono: 'verde' },
+    devolucion_en_proceso: { etiqueta: 'Devolución en proceso', tono: 'neutro' },
+    devuelto: { etiqueta: 'Devuelto', tono: 'neutro' },
+    anulado: { etiqueta: 'Sin cobro', tono: 'neutro' }
+};
+export const etiquetaPago = (estado) => ESTADOS_PAGO[estado]?.etiqueta || estado;
+export const tonoPago = (estado) => ESTADOS_PAGO[estado]?.tono || 'neutro';
 
 export const crearPedido = (cuerpo) => pedir('/api/pedidos', { method: 'POST', body: JSON.stringify(cuerpo) });
 export const listarPedidos = () => pedir('/api/pedidos');

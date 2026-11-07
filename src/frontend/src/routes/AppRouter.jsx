@@ -10,6 +10,7 @@ import Carrito from '../pages/public/Carrito';
 import PedidoCreado from '../pages/public/PedidoCreado';
 import Pedidos from '../pages/public/Pedidos';
 import SeguimientoPedido from '../pages/public/SeguimientoPedido';
+import MetodosPago from '../pages/public/MetodosPago';
 
 import ConsultarProductos from '../pages/admin/ConsultarProductos';
 import RegistrarProducto from '../pages/admin/RegistrarProducto';
@@ -32,6 +33,8 @@ function AppRouter() {
                 <Route path="/pedido-creado/:id" element={<RutaProtegida rolRequerido="cliente"><PedidoCreado /></RutaProtegida>} />
                 <Route path="/pedidos" element={<RutaProtegida rolRequerido="cliente"><Pedidos /></RutaProtegida>} />
                 <Route path="/pedidos/:id" element={<RutaProtegida rolRequerido="cliente"><SeguimientoPedido /></RutaProtegida>} />
+
+                <Route path="/metodos-pago" element={<RutaProtegida rolRequerido="cliente"><MetodosPago /></RutaProtegida>} />
 
                 <Route path="/admin/dashboard" element={<Navigate to="/admin/productos" replace />} />
                 <Route path="/admin/productos" element={<RutaProtegida rolRequerido="admin"><ConsultarProductos /></RutaProtegida>} />

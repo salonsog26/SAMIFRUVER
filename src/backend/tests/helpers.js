@@ -49,6 +49,18 @@ export function prepararEntorno() {
         api: request(app),
         // Devuelve las filas de una tabla ('clientes', 'productos', ...) ordenadas por id.
         leerTabla: (nombre) => db.public.many(`SELECT * FROM ${nombre} ORDER BY id`),
+        // Ejecuta SQL directo (para preparar casos que la API no permite, como una tarjeta ya vencida).
+        ejecutar: (sql) => db.public.none(sql),
         limpiar: () => cerrar()
     };
+}
+
+// Tarjetas de prueba (E4). Ambas pasan el algoritmo de Luhn; la pasarela simulada rechaza la que termina en 0002.
+export const TARJETA_OK = { titular: 'Ana Pérez', numero: '4242 4242 4242 4242', vencimiento: '08/40', cvv: '123' };
+export const TARJETA_RECHAZADA = { titular: 'Ana Pérez', numero: '4000 0000 0000 0002', vencimiento: '08/40', cvv: '123' };
+// Guarda una tarjeta del cliente por la API y devuelve su id.
+export async function guardarTarjeta(api, clienteId = 1, tarjeta = TARJETA_OK) {
+    const r = await api.post('/api/metodos-pago').set({ 'X-Cliente-Id': String(clienteId) }).send(tarjeta);
+    if (r.status !== 201) throw new Error(`No se pudo guardar la tarjeta de prueba: ${r.status} ${JSON.stringify(r.body)}`);
+    return r.body.metodo.id;
 }

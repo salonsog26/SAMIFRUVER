@@ -1,13 +1,14 @@
 // src/pages/public/Carrito.jsx — E3-HU2 Crear pedido (carrito, dirección, método de pago y "Realizar pedido")
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Minus, Plus, MapPin, CircleCheck, Circle } from 'lucide-react';
+import { Minus, Plus, MapPin, CircleCheck, Circle, CreditCard, Banknote } from 'lucide-react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import { EstadoVacio, Franja } from '../../components/pedidos/Estados';
 import { useCarrito, cambiarCantidad, eliminarDelCarrito, vaciarCarrito, sincronizarConCatalogo, MSJ_SIN_STOCK } from '../../utils/carrito';
-import { crearPedido, formatoCOP, precioPorUnidad, resumenCantidades } from '../../utils/pedidos';
+import { crearPedido, formatoCOP, precioPorUnidad, resumenCantidades, fechaHoraCorta } from '../../utils/pedidos';
 import { obtenerSesion } from '../../utils/auth';
+import { listarMetodos, MSJ_SIN_TARJETA } from '../../utils/pagos';
 import { API_URL } from '../../utils/config';
 import { resolverImagen, alFallarImagen } from '../../utils/imagenes';
 import '../../styles/variables.css';
@@ -18,9 +19,10 @@ export const MSJ_SIN_PAGO = 'Selección de método de pago es obligatorio';
 export const MSJ_SIN_DIRECCION = 'Selecciona o agrega una dirección de entrega.';
 const MSJ_RED = 'No se pudo conectar con el servidor. Intenta de nuevo.';
 
+// Métodos de pago de la Épica 4: tarjeta (una de las guardadas en /metodos-pago) o efectivo al recibir.
 const METODOS = [
-    { clave: 'tarjeta', titulo: 'Tarjeta', detalle: 'Visa ···· 4242' },
-    { clave: 'mercadopago', titulo: 'Mercado Pago', detalle: 'Paga con tu cuenta' }
+    { clave: 'tarjeta', titulo: 'Tarjeta de crédito o débito', Icono: CreditCard },
+    { clave: 'efectivo', titulo: 'Efectivo al recibir', detalle: 'Sin comisión · Pagas cuando llegue tu pedido', Icono: Banknote }
 ];
 
 const direccionDePerfil = (c) => (c && c.direccion && c.ciudad
@@ -48,6 +50,9 @@ function Carrito() {
     const [borrador, setBorrador] = useState({ linea: '', ciudad: '', telefono: '' });
     const [erroresDir, setErroresDir] = useState({});
     const [metodo, setMetodo] = useState('');
+    const [tarjetas, setTarjetas] = useState(null);             // tarjetas guardadas (E4-HU3); null = cargando
+    const [tarjetaId, setTarjetaId] = useState(null);           // tarjeta elegida para pagar
+    const [cargoFallido, setCargoFallido] = useState(null);     // { referencia, fecha } del último pago rechazado (E4-HU1 esc. 3)
     const [errorPago, setErrorPago] = useState(false);
     const [errorDireccion, setErrorDireccion] = useState(false);
     const [aviso, setAviso] = useState(null);                   // { tipo, texto } franja superior
@@ -76,6 +81,12 @@ function Carrito() {
                 setPerfilListo(true);
             })
             .catch(() => { if (!cancelado) setPerfilListo(true); /* el cliente puede escribir la dirección a mano */ });
+        listarMetodos().then((r) => {
+            if (cancelado) return;
+            const lista = r.ok ? (r.data.metodos || []) : [];
+            setTarjetas(lista);
+            setTarjetaId((lista.find((t) => t.predeterminada) || lista[0] || {}).id ?? null);
+        });
         return () => { cancelado = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -136,18 +147,30 @@ function Carrito() {
             setAviso({ tipo: 'error', texto: MSJ_SIN_DIRECCION });
             return;
         }
+        if (metodo === 'tarjeta' && !tarjetaId) {               // eligió tarjeta pero no hay ninguna guardada/seleccionada
+            setErrorPago(true);
+            setAviso({ tipo: 'error', texto: MSJ_SIN_TARJETA });
+            return;
+        }
 
         setEnviando(true);
+        setCargoFallido(null);
         const r = await crearPedido({
             items: items.map((i) => ({ productoId: i.productoId, cantidad: i.cantidad })),
             direccion: { alias: direccion.alias, nombre: direccion.nombre, linea: direccion.linea, ciudad: direccion.ciudad, telefono: direccion.telefono },
-            metodoPago: metodo
+            metodoPago: metodo,
+            ...(metodo === 'tarjeta' ? { metodoPagoId: tarjetaId } : {})
         });
         setEnviando(false);
 
         if (r.ok && r.data.pedido) {                            // ESC1: pedido creado → se vacía el carrito
             vaciarCarrito();
             navigate(`/pedido-creado/${r.data.pedido.id}`);
+            return;
+        }
+        if (r.status === 402) {                                 // ESC3: la entidad rechazó el cobro → carrito intacto, sin pedido
+            setCargoFallido(r.data.intento || { referencia: '', fecha: new Date().toISOString() });
+            setAviso({ tipo: 'error', texto: r.data.mensaje, detalle: r.data.detalle });
             return;
         }
         setAviso({ tipo: 'error', texto: r.red ? MSJ_RED : (r.data.mensaje || 'No se pudo crear el pedido. Intenta de nuevo.') });
@@ -172,7 +195,11 @@ function Carrito() {
                     </div>
                 </div>
 
-                {aviso && <Franja tipo={aviso.tipo} onCerrar={() => setAviso(null)}>{aviso.texto}</Franja>}
+                {aviso && (
+                    <Franja tipo={aviso.tipo} onCerrar={() => setAviso(null)}>
+                        {aviso.detalle ? <><strong>{aviso.texto}</strong><span className="pag-franja-detalle">{aviso.detalle}</span></> : aviso.texto}
+                    </Franja>
+                )}
 
                 <div className="ped-columnas ped-columnas-carrito">
                     <div className="ped-columna-principal">
@@ -262,14 +289,42 @@ function Carrito() {
                                         <h2 className="ped-tarjeta-titulo">Método de pago</h2>
                                         <div className="ped-opciones" role="radiogroup" aria-label="Método de pago" aria-invalid={errorPago}>
                                             {METODOS.map((m) => (
-                                                <button
-                                                    key={m.clave} type="button" role="radio" aria-checked={metodo === m.clave}
-                                                    className={`ped-opcion${metodo === m.clave ? ' seleccionada' : ''}`}
-                                                    onClick={() => { setMetodo(m.clave); setErrorPago(false); setAviso((a) => (a?.texto === MSJ_SIN_PAGO ? null : a)); }}
-                                                >
-                                                    {metodo === m.clave ? <CircleCheck size={22} aria-hidden="true" className="ped-opcion-icono" /> : <Circle size={22} aria-hidden="true" className="ped-opcion-icono vacio" />}
-                                                    <span className="ped-opcion-texto"><strong>{m.titulo}</strong><span>{m.detalle}</span></span>
-                                                </button>
+                                                <React.Fragment key={m.clave}>
+                                                    <button
+                                                        type="button" role="radio" aria-checked={metodo === m.clave}
+                                                        className={`ped-opcion${metodo === m.clave ? ' seleccionada' : ''}${cargoFallido && m.clave === 'tarjeta' && metodo === 'tarjeta' ? ' fallida' : ''}`}
+                                                        onClick={() => { setMetodo(m.clave); setErrorPago(false); setAviso((a) => (a?.texto === MSJ_SIN_PAGO || a?.texto === MSJ_SIN_TARJETA ? null : a)); }}
+                                                    >
+                                                        {metodo === m.clave ? <CircleCheck size={22} aria-hidden="true" className="ped-opcion-icono" /> : <Circle size={22} aria-hidden="true" className="ped-opcion-icono vacio" />}
+                                                        <span className="ped-opcion-texto"><strong>{m.titulo}</strong>{m.detalle && <span>{m.detalle}</span>}</span>
+                                                        <m.Icono size={20} aria-hidden="true" className="ped-opcion-icono vacio" />
+                                                    </button>
+                                                    {m.clave === 'tarjeta' && metodo === 'tarjeta' && (
+                                                        <div className="pag-sub" aria-label="Tarjetas guardadas">
+                                                            {tarjetas === null && <p className="ped-ayuda">Cargando tus tarjetas…</p>}
+                                                            {tarjetas && tarjetas.length === 0 && (
+                                                                <p className="ped-ayuda">Aún no tienes tarjetas guardadas. Agrega una para pagar con tarjeta.</p>
+                                                            )}
+                                                            {(tarjetas || []).map((t) => (
+                                                                <button key={t.id} type="button" role="radio" aria-checked={tarjetaId === t.id}
+                                                                    className={`pag-sub-opcion${tarjetaId === t.id ? ' seleccionada' : ''}${cargoFallido && tarjetaId === t.id ? ' fallida' : ''}`}
+                                                                    onClick={() => { setTarjetaId(t.id); setCargoFallido(null); setAviso((a) => (a?.texto === MSJ_SIN_TARJETA ? null : a)); setErrorPago(false); }}>
+                                                                    <span><strong>{t.descripcion}</strong><small>{t.titular} · Vence {t.vence}{t.predeterminada ? ' · Predeterminada' : ''}</small></span>
+                                                                    {tarjetaId === t.id ? <CircleCheck size={18} aria-hidden="true" className="ped-opcion-icono" /> : <Circle size={18} aria-hidden="true" className="ped-opcion-icono vacio" />}
+                                                                </button>
+                                                            ))}
+                                                            <div className="pag-sub-enlaces">
+                                                                <Link to="/metodos-pago?volver=carrito">{tarjetas && tarjetas.length ? 'Cambiar o agregar tarjeta' : 'Agregar tarjeta'}</Link>
+                                                            </div>
+                                                            {cargoFallido && (
+                                                                <div className="pag-cargo-fallido" role="status">
+                                                                    <span><strong>Cargo no realizado</strong><small>Intento del {fechaHoraCorta(cargoFallido.fecha)}</small></span>
+                                                                    {cargoFallido.referencia && <span>Ref. {cargoFallido.referencia}</span>}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </React.Fragment>
                                             ))}
                                         </div>
                                         {errorPago && <span className="form-error-text ped-error-pago">Selecciona una opción para continuar.</span>}

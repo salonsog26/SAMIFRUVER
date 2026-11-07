@@ -6,6 +6,7 @@ const productosRoutes = require('./routes/productos.routes');
 const authRoutes = require('./routes/auth.routes');
 const clientesRoutes = require('./routes/clientes.routes');
 const pedidosRoutes = require('./routes/pedidos.routes');
+const metodosPagoRoutes = require('./routes/metodos-pago.routes');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
+app.use('/api/metodos-pago', metodosPagoRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {

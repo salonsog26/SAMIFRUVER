@@ -233,3 +233,78 @@
 .ped-carrito-fila > div:last-child, .ped-carrito-precio { display: flex; align-items: center; gap: 14px; }
 .ped-agregar-dir, .ped-tarjeta .ped-enlace-fuerte { color: #20A34A; }
 .ped-pestanas a:hover { color: #10271B; }
+
+/* ===================== Épica 4 — Gestión de pago ===================== */
+.ped-franja-aviso { background: #FFF4D6; border-color: #F0D58A; color: #6B4A00; }
+.ped-insignia-neutro { background: #F1ECE0; color: #6B5B3A; }
+.pag-franja-detalle { display: block; font-weight: 400; margin-top: 2px; }
+
+/* Métodos de pago (HU3) */
+.pag-columnas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.pag-columna { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.pag-contador { margin: -6px 0 14px; }
+.pag-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.pag-tarjeta { border: 1px solid #DDE7DF; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; background: #fff; }
+.pag-tarjeta-cabecera { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.pag-marca { background: #F1ECE0; border-radius: 8px; padding: 4px 10px; font-weight: 700; font-size: 13px; color: #10271B; }
+.pag-predeterminada { background: #E8F5EC; color: #1B7F3A; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+.pag-tarjeta-nombre { font-size: 17px; color: #10271B; }
+.pag-tarjeta-detalle { color: #68786F; font-size: 13px; }
+.pag-tarjeta-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #EEF3EF; font-size: 12px; color: #68786F; }
+.pag-eliminar { display: inline-flex; align-items: center; gap: 4px; color: #C62828 !important; font-weight: 600; }
+.pag-vacio { border: 1.5px dashed #D3DDD5; border-radius: 14px; padding: 28px 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; background: #FBFCFA; }
+.pag-vacio p { margin: 0; color: #68786F; font-size: 13px; max-width: 320px; }
+.pag-vacio-icono { width: 52px; height: 52px; border-radius: 50%; background: #F1ECE0; color: #6B5B3A; display: inline-flex; align-items: center; justify-content: center; }
+.pag-nota-verde { display: flex; gap: 12px; background: #F6F1E7; border-radius: 14px; padding: 14px 16px; color: #6B5B3A; }
+.pag-nota-verde strong { color: #10271B; font-size: 14px; }
+.pag-nota-verde p { margin: 2px 0 0; font-size: 13px; color: #68786F; }
+.pag-efectivo { display: flex; align-items: center; gap: 6px; margin: 0; }
+.pag-marcas { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; }
+.pag-marcas span { border: 1px solid #DDE7DF; border-radius: 8px; padding: 3px 10px; font-size: 12px; font-weight: 700; color: #10271B; }
+.pag-marcas span.activa { border-color: #20A34A; background: #F0FAF3; color: #1B7F3A; }
+.pag-marcas small { color: #68786F; font-size: 12px; }
+.pag-form { display: grid; gap: 6px; margin-top: 10px; }
+.pag-form label { font-size: 13px; font-weight: 600; color: #10271B; margin-top: 8px; }
+.pag-form input[type="text"], .pag-form input[type="password"] { width: 100%; box-sizing: border-box; padding: 11px 12px; border: 1.5px solid #D3DDD5; border-radius: 10px; font-size: 15px; font-family: inherit; background: #fff; }
+.pag-form input[aria-invalid="true"] { border-color: #C62828; }
+.pag-form input:focus { outline: 2px solid #BFE3C9; border-color: #20A34A; }
+.pag-form input[aria-invalid="true"]:focus { outline-color: #F2B8B8; border-color: #C62828; }
+.pag-input-icono { position: relative; }
+.pag-input-icono svg { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #8A9A91; pointer-events: none; }
+.pag-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pag-form label.pag-check { display: flex; align-items: center; gap: 8px; font-weight: 400; color: #3d4f45; margin: 10px 0 6px; }
+.pag-check input { accent-color: #20A34A; width: 16px; height: 16px; }
+.pag-seguro { display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; }
+.pag-seguro svg { flex-shrink: 0; margin-top: 2px; }
+
+/* Pago dentro del carrito (HU1) */
+.pag-sub { margin: 4px 0 2px 34px; display: grid; gap: 8px; }
+.pag-sub-opcion { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 1.5px solid #DDE7DF; border-radius: 12px; padding: 10px 12px; background: #fff; font-family: inherit; font-size: 14px; cursor: pointer; }
+.pag-sub-opcion.seleccionada { border-color: #20A34A; background: #F0FAF3; }
+.pag-sub-opcion.fallida { border-color: #F2B8B8; background: #FDECEC; }
+.pag-sub-opcion > span:first-child { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.pag-sub-opcion small { color: #68786F; font-size: 12px; }
+.pag-sub-enlaces { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; }
+.pag-sub-enlaces a { color: #20A34A; font-weight: 700; text-decoration: none; }
+.pag-cargo-fallido { background: #FDECEC; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #C62828; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.pag-cargo-fallido small { color: #8c4a4a; display: block; }
+.pag-efectivo-nota { margin: 4px 0 0 34px; font-size: 13px; color: #6B4A00; }
+
+/* Resumen del pago (HU2) */
+.pag-resumen { display: flex; flex-direction: column; gap: 8px; }
+.pag-resumen dl { margin: 6px 0 0; display: grid; gap: 8px; border-top: 1px solid #EEF3EF; padding-top: 12px; }
+.pag-resumen dt { font-size: 12px; color: #68786F; }
+.pag-resumen dd { margin: 0; font-weight: 700; color: #10271B; font-size: 14px; }
+.pag-reintegro { background: #F6F1E7; border-radius: 12px; padding: 14px; margin-top: 4px; }
+.pag-reintegro span { font-size: 12px; color: #68786F; }
+.pag-reintegro strong { display: block; font-size: 24px; color: #10271B; margin: 2px 0 4px; }
+.pag-reintegro p { margin: 0; font-size: 12px; color: #68786F; }
+.pag-bloque-info { background: #F6F1E7; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: #68786F; }
+.pag-bloque-info strong { color: #10271B; font-size: 14px; }
+
+@media (max-width: 768px) {
+    .pag-columnas { grid-template-columns: minmax(0, 1fr); }
+    .pag-fila { grid-template-columns: 1fr; }
+    .pag-sub, .pag-efectivo-nota { margin-left: 0; }
+}
+.ped-opcion.fallida { border-color: #F2B8B8; background: #FDECEC; }

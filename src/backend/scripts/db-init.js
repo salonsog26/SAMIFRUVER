@@ -9,7 +9,7 @@ const { getPool, cerrar } = require('../lib/db');
 const CARPETA = path.join(__dirname, '../../../database');
 
 (async () => {
-    const archivos = ['01_schema.sql'];
+    const archivos = ['01_schema.sql', '03_e4_migracion.sql'];   // la migración es idempotente (E4)
     if (!process.argv.includes('--sin-datos')) archivos.push('02_seed.sql');
     try {
         for (const nombre of archivos) {

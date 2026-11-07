@@ -19,7 +19,8 @@ const PRODUCTOS_API = [{ ...TOMATE }];
 
 const base = (estado, extra = {}) => ({
     id: 3, numero: 'SF-1003', estado, subtotal: 6000, domicilio: 5000, total: 11000,
-    metodoPago: 'tarjeta', pagoDetalle: 'Visa ···· 4242',
+    metodoPago: 'tarjeta', pagoDetalle: 'Visa terminada en 4242', pagoEstado: 'aprobado',
+    pago: { estado: 'aprobado', etiqueta: 'Aprobado', metodo: 'tarjeta', detalle: 'Visa terminada en 4242', total: 11000, referencia: 'TX-1003', pagadoEn: '2026-10-24T15:00:00.000Z', devolucion: null },
     direccion: { alias: 'Casa', nombre: 'Ana Pérez', linea: 'Calle 10 # 5-20', ciudad: 'Popayán', telefono: '3001234567' },
     repartidor: null, devolucionIniciada: false,
     creadoEn: '2026-10-24T15:00:00.000Z', canceladoEn: null, entregadoEn: null,
@@ -37,6 +38,7 @@ describe('E3-HU2 Carrito y creación de pedido', () => {
         const f = simularFetch({
             'GET /api/productos': { json: PRODUCTOS_API },
             'GET /api/clientes/1': { json: CLIENTE_API },
+            'GET /api/metodos-pago': { json: { metodos: [] } },
             ...rutas
         });
         renderEnRutas([
@@ -78,12 +80,12 @@ describe('E3-HU2 Carrito y creación de pedido', () => {
         agregarAlCarrito(TOMATE);
         const f = montarCarrito({ 'POST /api/pedidos': { status: 201, json: { pedido: base('recibido') } } });
         await screen.findByText(/Calle 10 # 5-20/);
-        await userEvent.click(screen.getByRole('radio', { name: /tarjeta/i }));
+        await userEvent.click(screen.getByRole('radio', { name: /efectivo/i }));
         await userEvent.click(screen.getByRole('button', { name: /realizar pedido/i }));
         await waitFor(() => expect(rutaActual()).toBe('/pedido-creado/3'));
         const [, opc] = llamadasA(f, 'POST /api/pedidos')[0];
         expect(opc.headers['X-Cliente-Id']).toBe('1');
-        expect(JSON.parse(opc.body).metodoPago).toBe('tarjeta');
+        expect(JSON.parse(opc.body).metodoPago).toBe('efectivo');
         expect(leerCarrito()).toEqual([]);
     });
 
@@ -98,7 +100,7 @@ describe('E3-HU2 Carrito y creación de pedido', () => {
         agregarAlCarrito(TOMATE);
         montarCarrito({ 'POST /api/pedidos': { status: 409, json: { mensaje: 'No hay suficiente stock de Tomate. Disponible: 1 lb.' } } });
         await screen.findByText(/Calle 10 # 5-20/);
-        await userEvent.click(screen.getByRole('radio', { name: /mercado pago/i }));
+        await userEvent.click(screen.getByRole('radio', { name: /efectivo/i }));
         await userEvent.click(screen.getByRole('button', { name: /realizar pedido/i }));
         expect(await screen.findByText(/No hay suficiente stock de Tomate/)).toBeInTheDocument();
         expect(leerCarrito()).toHaveLength(1);

@@ -1,7 +1,7 @@
 // src/components/public/ClienteSidebar.jsx — menú lateral del área "Mi cuenta" (cliente)
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Package, MapPin, Heart, LogOut, X } from 'lucide-react';
+import { User, Package, MapPin, Heart, LogOut, X, CreditCard } from 'lucide-react';
 import logo from '../../assets/logo-samifruver.png';
 import { obtenerSesion, cerrarSesion } from '../../utils/auth';
 import { iniciales } from './Navbar';
@@ -47,6 +47,10 @@ function ClienteSidebar({ nombre }) {
                     <Link to="/pedidos" className="menu-item">
                         <Package className="menu-icon" size={18} />
                         <span className="menu-item-text">Mis pedidos</span>
+                    </Link>
+                    <Link to="/metodos-pago" className="menu-item">
+                        <CreditCard className="menu-icon" size={18} />
+                        <span className="menu-item-text">Métodos de pago</span>
                     </Link>
                     {OPCIONES_PROXIMAMENTE.map(({ texto, Icono }) => (
                         <button key={texto} type="button" className="menu-item menu-item-boton" title="Próximamente" aria-disabled="true" onClick={(e) => e.preventDefault()}>

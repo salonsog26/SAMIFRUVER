@@ -14,5 +14,5 @@ Este directorio contiene el código fuente de la aplicación del lado del client
 
 ## Épica 3 · Pedidos
 
-Rutas de cliente: `/carrito`, `/pedido-creado/:id`, `/pedidos` (historial) y `/pedidos/:id` (seguimiento y cancelación). El carrito se guarda en `localStorage` por cliente. Dirección y pago son simulados (Visa ···· 4242 / Mercado Pago, sin cobro real) y el mapa del repartidor es ilustrativo. Estilos en `src/styles/pedidos.css`.
+Rutas de cliente: `/carrito`, `/pedido-creado/:id`, `/pedidos` (historial) y `/pedidos/:id` (seguimiento y cancelación). El carrito se guarda en `localStorage` por cliente. La dirección es simulada y el mapa del repartidor es ilustrativo. **Pagos (Épica 4):** `/metodos-pago` (guardar y eliminar tarjetas; solo se muestran tipo y últimos 4 dígitos); en el carrito se paga con una tarjeta guardada o en efectivo al recibir (la pasarela es simulada: la tarjeta terminada en `0002` se rechaza), y el detalle del pedido muestra el estado del pago (Aprobado, Pendiente, Devolución en proceso, Devuelto). Estilos en `src/styles/pedidos.css`.
 Tests: `npm test` (102).

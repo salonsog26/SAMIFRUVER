@@ -26,6 +26,7 @@ function Navbar({ cartCount }) {
                 <nav className="public-navbar-links" aria-label="Secciones de la tienda">
                     <NavLink to="/" end className={({ isActive }) => `public-navbar-link${isActive ? ' activo' : ''}`}>Catálogo</NavLink>
                     <NavLink to="/pedidos" className={({ isActive }) => `public-navbar-link${isActive ? ' activo' : ''}`}>Mis pedidos</NavLink>
+                    <NavLink to="/metodos-pago" className={({ isActive }) => `public-navbar-link${isActive ? ' activo' : ''}`}>Métodos de pago</NavLink>
                 </nav>
             )}
 

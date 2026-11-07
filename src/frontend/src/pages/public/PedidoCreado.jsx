@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
-import { Franja, InsigniaEstado } from '../../components/pedidos/Estados';
+import { Franja, InsigniaEstado, InsigniaPago } from '../../components/pedidos/Estados';
 import { obtenerPedido, formatoCOP, resumenCantidades } from '../../utils/pedidos';
 import '../../styles/variables.css';
 import '../../styles/pedidos.css';
@@ -32,16 +32,29 @@ function PedidoCreado() {
                 {!pedido && !error && <p className="ped-cargando">Cargando tu pedido…</p>}
                 {pedido && (
                     <>
-                        <Franja tipo="exito">Tu pedido #{pedido.numero} fue creado correctamente. Tu carrito está vacío.</Franja>
+                        {pedido.pago?.estado === 'pendiente' ? (
+                            <Franja tipo="aviso">
+                                <strong>Estado: Pago Pendiente.</strong>
+                                <span className="pag-franja-detalle">Recuerda tener listo el importe exacto de {formatoCOP(pedido.total)} COP para pagarle al domiciliario al recibir tu pedido.</span>
+                            </Franja>
+                        ) : (
+                            <Franja tipo="exito">
+                                <strong>Pago realizado correctamente</strong>
+                                <span className="pag-franja-detalle">Tu pedido #{pedido.numero} ya está confirmado. Tu carrito está vacío.</span>
+                            </Franja>
+                        )}
                         <section className="ped-tarjeta ped-confirmacion" aria-label="Pedido creado">
                             <span className="ped-confirmacion-check" aria-hidden="true"><Check size={36} /></span>
                             <h1 className="ped-confirmacion-titulo">Pedido creado exitosamente</h1>
                             <p className="ped-confirmacion-numero">Pedido #{pedido.numero}</p>
                             <InsigniaEstado estado={pedido.estado} />
+                            {pedido.pago && <InsigniaPago estado={pedido.pago.estado} />}
                             <p className="ped-confirmacion-detalle">
                                 {resumenCantidades(pedido.productos, pedido.unidades)} · Total: {formatoCOP(pedido.total)} COP<br />
                                 {pedido.direccion.alias} · {pedido.direccion.linea}, {pedido.direccion.ciudad}<br />
-                                {pedido.metodoPago === 'tarjeta' ? `Pago aprobado con ${pedido.pagoDetalle}` : 'Pago aprobado con Mercado Pago'}
+                                {pedido.metodoPago === 'efectivo'
+                                    ? `Pago pendiente: ${formatoCOP(pedido.total)} COP en efectivo al recibir`
+                                    : `Pago aprobado con ${pedido.pagoDetalle}${pedido.pago?.referencia ? ` · Ref. ${pedido.pago.referencia}` : ''}`}
                             </p>
                             <div className="ped-confirmacion-botones">
                                 <Link to={`/pedidos/${pedido.id}`} className="ped-boton ped-boton-primario">Ver seguimiento</Link>

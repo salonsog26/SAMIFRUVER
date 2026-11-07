@@ -53,6 +53,23 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_productos_nombre ON productos (LOWER(nombre
 CREATE INDEX IF NOT EXISTS ix_productos_categoria ON productos (categoria_id);
 
 -- =====================================================================
+-- Épica 4 — Gestión de Pago (E4-HU3): tarjetas guardadas del cliente.
+-- Solo se guardan marca, últimos 4 dígitos, titular y vencimiento. NUNCA el número completo ni el CVV.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS metodos_pago (
+    id              SERIAL PRIMARY KEY,
+    cliente_id      INTEGER      NOT NULL REFERENCES clientes (id) ON DELETE CASCADE,
+    marca           VARCHAR(12)  NOT NULL CHECK (marca IN ('visa', 'mastercard')),
+    ultimos4        VARCHAR(4)   NOT NULL,
+    titular         VARCHAR(80)  NOT NULL,
+    vence_mes       INTEGER      NOT NULL CHECK (vence_mes BETWEEN 1 AND 12),
+    vence_anio      INTEGER      NOT NULL CHECK (vence_anio BETWEEN 2000 AND 2099),
+    predeterminada  BOOLEAN      NOT NULL DEFAULT FALSE,
+    creado_en       TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS ix_metodos_pago_cliente ON metodos_pago (cliente_id);
+
+-- =====================================================================
 -- Épica 3 — Gestión de Pedidos
 -- =====================================================================
 
@@ -69,8 +86,16 @@ CREATE TABLE IF NOT EXISTS pedidos (
     subtotal             NUMERIC(12,2)  NOT NULL CHECK (subtotal >= 0),
     domicilio            NUMERIC(12,2)  NOT NULL DEFAULT 0 CHECK (domicilio >= 0),
     total                NUMERIC(12,2)  NOT NULL CHECK (total >= 0),
-    metodo_pago          VARCHAR(15)    NOT NULL CHECK (metodo_pago IN ('tarjeta', 'mercadopago')),
+    metodo_pago          VARCHAR(15)    NOT NULL CHECK (metodo_pago IN ('tarjeta', 'efectivo')),
     pago_detalle         VARCHAR(60)    NOT NULL DEFAULT '',
+    -- Épica 4 (pagos): estado del pago y datos del cobro / reintegro (el pago es simulado, no hay cobro real).
+    pago_estado          VARCHAR(25)    NOT NULL DEFAULT 'pendiente'
+                         CHECK (pago_estado IN ('pendiente', 'aprobado', 'devolucion_en_proceso', 'devuelto', 'anulado')),
+    pago_referencia      VARCHAR(20),
+    pagado_en            TIMESTAMPTZ,
+    metodo_pago_id       INTEGER,
+    devolucion_ref       VARCHAR(20),
+    devuelto_en          TIMESTAMPTZ,
     dir_alias            VARCHAR(40)    NOT NULL DEFAULT 'Casa',
     dir_nombre           VARCHAR(80)    NOT NULL DEFAULT '',
     dir_linea            VARCHAR(160)   NOT NULL,

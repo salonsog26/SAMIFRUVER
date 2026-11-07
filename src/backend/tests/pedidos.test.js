@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { prepararEntorno } from './helpers.js';
+import { prepararEntorno, guardarTarjeta } from './helpers.js';
 
 let env;
-beforeEach(() => { env = prepararEntorno(); });
+let TARJETA_ID;   // tarjeta guardada de Ana (cliente 1); con tarjeta, el pedido exige una tarjeta guardada (E4)
+beforeEach(async () => { env = prepararEntorno(); TARJETA_ID = await guardarTarjeta(env.api, 1); });
 afterEach(() => { delete process.env.ADMIN_KEY; return env.limpiar(); });
 
 // Productos semilla: 1 Tomate ($3.000, stock 20) y 2 Jengibre ($5.000, stock 10). Clientes: 1 Ana y 2 Luis.
@@ -11,6 +12,7 @@ const pedidoValido = (extra = {}) => ({
     items: [{ productoId: 1, cantidad: 2 }, { productoId: 2, cantidad: 1 }],
     direccion: DIRECCION,
     metodoPago: 'tarjeta',
+    metodoPagoId: TARJETA_ID,
     ...extra
 });
 const como = (id) => ({ 'X-Cliente-Id': String(id) });
@@ -24,7 +26,7 @@ describe('E3-HU2 Crear pedido', () => {
         expect(r.body.mensaje).toBe('Pedido creado correctamente');
         const p = r.body.pedido;
         expect(p).toMatchObject({ id: 1, numero: 'SF-1001', estado: 'recibido', subtotal: 11000, domicilio: 5000, total: 16000, productos: 2, unidades: 3 });
-        expect(p.pagoDetalle).toBe('Visa ···· 4242');
+        expect(p.pagoDetalle).toBe('Visa terminada en 4242');
         expect(p.direccion).toMatchObject({ linea: 'Calle 95 # 15-42, apto. 302', ciudad: 'Bogotá' });
         expect(p.items.map((i) => [i.nombre, i.cantidad, i.subtotal])).toEqual([['Tomate', 2, 6000], ['Jengibre', 1, 5000]]);
         expect(stockDe(1)).toBe(18);
@@ -46,10 +48,10 @@ describe('E3-HU2 Crear pedido', () => {
         expect(r.body.pedido.items[0].cantidad).toBe(3);
         expect(stockDe(1)).toBe(17);
     });
-    it('también acepta Mercado Pago', async () => {
-        const r = await crear(pedidoValido({ metodoPago: 'mercadopago' }));
+    it('también acepta pago en efectivo (sin tarjeta guardada)', async () => {
+        const r = await crear(pedidoValido({ metodoPago: 'efectivo', metodoPagoId: undefined }));
         expect(r.status).toBe(201);
-        expect(r.body.pedido).toMatchObject({ metodoPago: 'mercadopago', pagoDetalle: 'Mercado Pago' });
+        expect(r.body.pedido).toMatchObject({ metodoPago: 'efectivo', pagoDetalle: 'Efectivo al recibir', pagoEstado: 'pendiente' });
     });
     it('ESC2: carrito vacío → 400 y no crea nada', async () => {
         for (const items of [[], undefined, 'x']) {
@@ -60,7 +62,7 @@ describe('E3-HU2 Crear pedido', () => {
         expect(env.leerTabla('pedidos')).toHaveLength(0);
     });
     it('ESC3: sin método de pago → 400 "Selección de método de pago es obligatorio" y no descuenta stock', async () => {
-        for (const metodoPago of [undefined, '', 'efectivo', 5]) {
+        for (const metodoPago of [undefined, '', 'mercadopago', 5]) {
             const r = await crear(pedidoValido({ metodoPago }));
             expect(r.status).toBe(400);
             expect(r.body.mensaje).toBe('Selección de método de pago es obligatorio');
@@ -156,7 +158,7 @@ describe('E3-HU3 Historial de pedidos', () => {
     });
     it('un cliente no ve los pedidos de otro', async () => {
         await crear();
-        await crear(pedidoValido(), 2);
+        await crear(pedidoValido({ metodoPago: 'efectivo', metodoPagoId: undefined }), 2);
         expect((await env.api.get('/api/pedidos').set(como(1))).body.pedidos).toHaveLength(1);
         expect((await env.api.get('/api/pedidos').set(como(2))).body.pedidos).toHaveLength(1);
     });

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Check, CircleAlert, Info, X, ShoppingBasket } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ETAPAS, etiquetaEstado, tonoEstado, hora, formatoCOP } from '../../utils/pedidos';
+import { ETAPAS, etiquetaEstado, tonoEstado, hora, formatoCOP, etiquetaPago, tonoPago, fechaHoraCorta } from '../../utils/pedidos';
 import { resolverImagen, alFallarImagen } from '../../utils/imagenes';
 import '../../styles/pedidos.css';
 
@@ -16,9 +16,9 @@ export function InsigniaEstado({ estado }) {
     );
 }
 
-// Franja de aviso a todo el ancho. tipo: 'info' | 'exito' | 'error'. Con onCerrar muestra la X.
+// Franja de aviso a todo el ancho. tipo: 'info' | 'exito' | 'error' | 'aviso' (ámbar). Con onCerrar muestra la X.
 export function Franja({ tipo = 'info', children, onCerrar, className = '' }) {
-    const Icono = tipo === 'error' ? CircleAlert : tipo === 'exito' ? Check : Info;
+    const Icono = tipo === 'error' ? CircleAlert : tipo === 'exito' ? Check : Info;   // 'aviso' y 'info' usan el ícono de información
     return (
         <div className={`ped-franja ped-franja-${tipo} ${className}`.trim()} role={tipo === 'error' ? 'alert' : 'status'}>
             <Icono size={20} aria-hidden="true" />
@@ -27,6 +27,71 @@ export function Franja({ tipo = 'info', children, onCerrar, className = '' }) {
                 <button type="button" className="ped-franja-cerrar" aria-label="Cerrar aviso" onClick={onCerrar}><X size={18} /></button>
             )}
         </div>
+    );
+}
+
+// Etiqueta del estado del pago (Épica 4): "● Aprobado", "● Pendiente", "● Devolución en proceso"...
+export function InsigniaPago({ estado }) {
+    return (
+        <span className={`ped-insignia ped-insignia-${tonoPago(estado)}`} data-pago={estado}>
+            <span className="ped-insignia-punto" aria-hidden="true" />
+            Estado: {etiquetaPago(estado)}
+        </span>
+    );
+}
+
+// Franja con el mensaje del estado del pago de un pedido (E4-HU2).
+export function FranjaPago({ pedido }) {
+    const { pago } = pedido;
+    if (!pago) return null;
+    const total = `${formatoCOP(pago.total)} COP`;
+    if (pago.estado === 'aprobado') {
+        return <Franja tipo="exito"><strong>Tu pago está aprobado</strong><span className="pag-franja-detalle">Hemos recibido los {total} de tu compra.</span></Franja>;
+    }
+    if (pago.estado === 'pendiente') {
+        return <Franja tipo="aviso"><strong>Estado: Pago Pendiente.</strong><span className="pag-franja-detalle">El pago se realiza al recibir el pedido. Ten listo el importe exacto de {total}.</span></Franja>;
+    }
+    if (pago.estado === 'devolucion_en_proceso') {
+        return <Franja tipo="info"><strong>Estamos gestionando tu devolución</strong><span className="pag-franja-detalle">Hemos recibido tu solicitud de cancelación. El reintegro de {total} está en proceso; todavía no se ha abonado.</span></Franja>;
+    }
+    if (pago.estado === 'devuelto') {
+        return <Franja tipo="exito"><strong>Devolución completada</strong><span className="pag-franja-detalle">Reintegramos {total} a tu tarjeta {pago.detalle.replace(/^.* terminada en /, '···· ')}.</span></Franja>;
+    }
+    return <Franja tipo="info"><strong>Sin cobro</strong><span className="pag-franja-detalle">Cancelaste el pedido antes de pagarlo, así que no se realizó ningún cargo.</span></Franja>;
+}
+
+// "Resumen del pago" (E4-HU2): estado, desglose, método, fecha, referencia y, si aplica, el total a reintegrar.
+export function ResumenPago({ pedido, compacto = false }) {
+    const { pago } = pedido;
+    if (!pago) return null;
+    const dev = pago.devolucion;
+    return (
+        <section className="ped-tarjeta pag-resumen" aria-label="Resumen del pago">
+            <h2 className="ped-tarjeta-titulo ped-titulo-medio">Resumen del pago</h2>
+            <div><InsigniaPago estado={pago.estado} /></div>
+            {!compacto && (
+                <>
+                    <div className="ped-resumen-fila"><span>Subtotal · {pedido.productos} {pedido.productos === 1 ? 'producto' : 'productos'}</span><span>{formatoCOP(pedido.subtotal)}</span></div>
+                    <div className="ped-resumen-fila"><span>Domicilio</span><span>{formatoCOP(pedido.domicilio)}</span></div>
+                </>
+            )}
+            <div className="ped-resumen-total"><span>{pago.estado === 'pendiente' ? 'Total a pagar' : 'Total'}</span><strong>{formatoCOP(pago.total)} COP</strong></div>
+            <dl>
+                <div><dt>Método de pago</dt><dd>{pago.metodo === 'efectivo' ? 'Efectivo al recibir' : pago.detalle}</dd></div>
+                {pago.pagadoEn && <div><dt>Fecha del pago original</dt><dd>{fechaHoraCorta(pago.pagadoEn)}</dd></div>}
+                {pago.referencia && <div><dt>Referencia de transacción</dt><dd>{pago.referencia}</dd></div>}
+                {dev && dev.referencia && <div><dt>Referencia de devolución</dt><dd>{dev.referencia}</dd></div>}
+            </dl>
+            {dev && (
+                <div className="pag-reintegro">
+                    <span>{dev.estado === 'devuelto' ? 'Total reintegrado' : 'Total a reintegrar'}</span>
+                    <strong>{formatoCOP(dev.monto)} COP</strong>
+                    <p>{dev.estado === 'devuelto'
+                        ? `Se abonó en la tarjeta original${dev.devueltoEn ? ` el ${fechaHoraCorta(dev.devueltoEn)}` : ''}.`
+                        : 'Se abonará en la tarjeta original. El reintegro aún no se ha completado.'}</p>
+                </div>
+            )}
+        </section>
     );
 }
 
