@@ -33,6 +33,7 @@ export function ponerSesion(sesion) {
 }
 export const SESION_ADMIN = { correo: 'admin@samifruber.com', nombre: 'Administrador', rol: 'admin', token: 't' };
 export const SESION_CLIENTE = { id: 1, nombre: 'Ana Pérez', correo: 'ana@correo.com', telefono: '3001234567', rol: 'cliente', token: 't' };
+export const SESION_DOMICILIARIO = { id: 1, nombre: 'Carlos Ruiz', correo: 'domicilio@samifruver.com', telefono: '310 555 0194', vehiculo: 'Moto', rol: 'domiciliario', token: 't' };
 
 function MostrarRuta() {
     const l = useLocation();

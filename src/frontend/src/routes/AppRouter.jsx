@@ -15,6 +15,12 @@ import ConsultarProductos from '../pages/admin/ConsultarProductos';
 import RegistrarProducto from '../pages/admin/RegistrarProducto';
 import EditarProducto from '../pages/admin/EditarProducto';
 
+import DomiciliarioLayout from '../components/domiciliario/DomiciliarioLayout';
+import MisPedidos from '../pages/domiciliario/MisPedidos';
+import DetallePedido from '../pages/domiciliario/DetallePedido';
+import HistorialEntregas from '../pages/domiciliario/HistorialEntregas';
+import PerfilDomiciliario from '../pages/domiciliario/PerfilDomiciliario';
+
 import RutaProtegida from './RutaProtegida';
 
 function AppRouter() {
@@ -37,6 +43,14 @@ function AppRouter() {
                 <Route path="/admin/productos" element={<RutaProtegida rolRequerido="admin"><ConsultarProductos /></RutaProtegida>} />
                 <Route path="/admin/productos/nuevo" element={<RutaProtegida rolRequerido="admin"><RegistrarProducto /></RutaProtegida>} />
                 <Route path="/admin/productos/editar/:id" element={<RutaProtegida rolRequerido="admin"><EditarProducto /></RutaProtegida>} />
+
+                <Route path="/domiciliario" element={<RutaProtegida rolRequerido="domiciliario"><DomiciliarioLayout /></RutaProtegida>}>
+                    <Route index element={<Navigate to="pedidos" replace />} />
+                    <Route path="pedidos" element={<MisPedidos />} />
+                    <Route path="pedidos/:id" element={<DetallePedido />} />
+                    <Route path="historial" element={<HistorialEntregas />} />
+                    <Route path="perfil" element={<PerfilDomiciliario />} />
+                </Route>
 
                 <Route path="*" element={<div style={{ textAlign: 'center', marginTop: '50px' }}><h2>404 - Página no encontrada</h2></div>} />
             </Routes>

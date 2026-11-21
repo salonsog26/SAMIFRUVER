@@ -22,6 +22,10 @@ export const CLIENTES_SEMILLA = [
     { id: 1, nombre: 'Ana Pérez', correo: 'ana@correo.com', telefono: '3001234567', password: 'clave1234' },
     { id: 2, nombre: 'Luis Gómez', correo: 'luis@correo.com', telefono: '3109876543', password: 'secreto99' }
 ];
+export const DOMICILIARIOS_SEMILLA = [
+    { id: 1, nombre: 'Carlos Ruiz', correo: 'domicilio@samifruver.com', telefono: '310 555 0194', vehiculo: 'Moto', password: 'domicilio123' },
+    { id: 2, nombre: 'Reparto Dos', correo: 'reparto2@correo.com', telefono: '3001112233', vehiculo: 'Bicicleta', password: 'clave1234' }
+];
 const ADMIN = { nombre: 'Administrador', password: 'admin123', correos: ['admin@samifruver.com', 'admin@samifruber.com'] };
 
 const q = (v) => `'${String(v).replace(/'/g, "''")}'`;
@@ -41,12 +45,17 @@ export function prepararEntorno() {
         db.public.none(`INSERT INTO clientes (nombre, correo, telefono, password_hash)
             VALUES (${q(c.nombre)}, ${q(c.correo)}, ${q(c.telefono)}, ${q(hashSync(c.password))})`);
     }
+    for (const d of DOMICILIARIOS_SEMILLA) {
+        db.public.none(`INSERT INTO domiciliarios (nombre, correo, telefono, vehiculo, password_hash)
+            VALUES (${q(d.nombre)}, ${q(d.correo)}, ${q(d.telefono)}, ${q(d.vehiculo)}, ${q(hashSync(d.password))})`);
+    }
     // Los ids (1, 2, ...) los asigna la propia base, igual que en PostgreSQL real.
     const { Pool } = db.adapters.createPg();
     setPool(new Pool());
     const app = require('../app');
     return {
         api: request(app),
+        db: db.public,
         // Devuelve las filas de una tabla ('clientes', 'productos', ...) ordenadas por id.
         leerTabla: (nombre) => db.public.many(`SELECT * FROM ${nombre} ORDER BY id`),
         limpiar: () => cerrar()

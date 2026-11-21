@@ -9,7 +9,10 @@ function RutaProtegida({ rolRequerido, children }) {
 
     if (!sesion) return <Navigate to="/login" replace />;
     if (rolRequerido && sesion.rol !== rolRequerido) {
-        return <Navigate to={sesion.rol === 'admin' ? '/admin/productos' : '/'} replace />;
+        const destino = sesion.rol === 'admin' ? '/admin/productos'
+            : sesion.rol === 'domiciliario' ? '/domiciliario/pedidos'
+            : '/';
+        return <Navigate to={destino} replace />;
     }
     return children;
 }

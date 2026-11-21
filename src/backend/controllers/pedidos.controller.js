@@ -72,7 +72,16 @@ const aPedido = (p, items = []) => {
         total: Number(p.total),
         metodoPago: p.metodo_pago,
         pagoDetalle: p.pago_detalle,
-        direccion: { alias: p.dir_alias, nombre: p.dir_nombre, linea: p.dir_linea, ciudad: p.dir_ciudad, telefono: p.dir_telefono },
+        pagoEstado: p.pago_estado || 'aprobado',
+        direccion: {
+            alias: p.dir_alias, nombre: p.dir_nombre, linea: p.dir_linea, ciudad: p.dir_ciudad,
+            telefono: p.dir_telefono, indicaciones: p.dir_indicaciones || ''
+        },
+        entregaEstimada: iso(p.entrega_estimada),
+        domiciliarioId: p.domiciliario_id || null,
+        clienteNombre: p.cliente_nombre || p.dir_nombre || '',
+        clienteTelefono: p.cliente_telefono || p.dir_telefono || '',
+        clienteFoto: p.cliente_foto || null,
         repartidor: p.repartidor_nombre
             ? { nombre: p.repartidor_nombre, vehiculo: p.repartidor_vehiculo, telefono: p.repartidor_telefono }
             : null,
@@ -182,9 +191,9 @@ const crearPedido = asincrono(async (req, res) => {
             }
             const subtotal = lineas.reduce((s, l) => s + l.subtotal, 0);
             const ins = await cx.query(
-                `INSERT INTO pedidos (cliente_id, subtotal, domicilio, total, metodo_pago, pago_detalle,
+                `INSERT INTO pedidos (cliente_id, subtotal, domicilio, total, metodo_pago, pago_detalle, pago_estado,
                                       dir_alias, dir_nombre, dir_linea, dir_ciudad, dir_telefono)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+                 VALUES ($1, $2, $3, $4, $5, $6, 'aprobado', $7, $8, $9, $10, $11) RETURNING id`,
                 [req.cliente.id, subtotal, DOMICILIO, subtotal + DOMICILIO, body.metodoPago, METODOS_PAGO[body.metodoPago],
                     dir.alias, dir.nombre, dir.linea, dir.ciudad, dir.telefono]
             );
@@ -279,7 +288,18 @@ const avanzarEstado = async (id, { repartidor } = {}) => {
     if (!nuevo) throw new ErrorNegocio(409, `El pedido está "${actual}" y no puede avanzar.`);
 
     const columna = COLUMNA_HORA[nuevo];
-    const rep = nuevo === 'en_camino' ? { ...REPARTIDOR_DEMO, ...(repartidor || {}) } : null;
+    let rep = null;
+    if (nuevo === 'en_camino') {
+        const asignado = (await query(
+            `SELECT d.nombre, d.vehiculo, d.telefono FROM pedidos p
+             JOIN domiciliarios d ON d.id = p.domiciliario_id WHERE p.id = $1`,
+            [id]
+        )).rows[0];
+        const base = asignado
+            ? { nombre: asignado.nombre, vehiculo: asignado.vehiculo, telefono: asignado.telefono }
+            : REPARTIDOR_DEMO;
+        rep = { ...base, ...(repartidor || {}) };
+    }
     const r = await query(
         `UPDATE pedidos SET estado = $2, ${columna} = now()
             ${rep ? ', repartidor_nombre = $4, repartidor_vehiculo = $5, repartidor_telefono = $6' : ''}
@@ -304,8 +324,52 @@ const avanzarEstadoHttp = asincrono(async (req, res) => {
     }
 });
 
+// ---------------------------------------------------------------- Épica 5: asignar un pedido a un domiciliario
+// POST /api/pedidos/:id/asignar  (cabecera X-Admin-Key)
+// body: { domiciliarioId, entregaEstimada? }
+// Si el pedido sigue en "recibido", pasa a "preparacion" para que el domiciliario pueda recogerlo.
+const asignarDomiciliarioHttp = asincrono(async (req, res) => {
+    const id = idDeUrl(req.params.id);
+    const domiciliarioId = idDeUrl(req.body && req.body.domiciliarioId);
+    if (id === null) return res.status(404).json({ mensaje: MSJ_NO_ENCONTRADO });
+    if (domiciliarioId === null) return res.status(400).json({ mensaje: 'Indica el domiciliario que recibirá el pedido.' });
+    try {
+        const dom = await query('SELECT id, nombre FROM domiciliarios WHERE id = $1', [domiciliarioId]);
+        if (!dom.rows[0]) throw new ErrorNegocio(404, 'Domiciliario no encontrado.');
+        let entrega = new Date(Date.now() + 60 * 60000).toISOString();
+        if (req.body && req.body.entregaEstimada) {
+            const fecha = new Date(req.body.entregaEstimada);
+            if (Number.isNaN(fecha.getTime())) throw new ErrorNegocio(400, 'La hora estimada de entrega no es válida.');
+            entrega = fecha.toISOString();
+        }
+        const r = await query(
+            `UPDATE pedidos SET
+                domiciliario_id = $2,
+                entrega_estimada = $3,
+                estado = CASE WHEN estado = 'recibido' THEN 'preparacion' ELSE estado END,
+                preparacion_en = CASE WHEN estado = 'recibido' THEN now() ELSE preparacion_en END
+             WHERE id = $1 AND estado IN ('recibido', 'preparacion')
+             RETURNING id`,
+            [id, domiciliarioId, entrega]
+        );
+        if (!r.rows[0]) {
+            const p = await query('SELECT id, estado FROM pedidos WHERE id = $1', [id]);
+            if (!p.rows[0]) throw new ErrorNegocio(404, MSJ_NO_ENCONTRADO);
+            throw new ErrorNegocio(409, 'Este pedido ya no se puede asignar.');
+        }
+        const { rows } = await query('SELECT * FROM pedidos WHERE id = $1', [id]);
+        res.json({
+            mensaje: 'Pedido asignado correctamente',
+            pedido: aPedido(rows[0], await itemsDe(id))
+        });
+    } catch (error) {
+        if (error instanceof ErrorNegocio) return responderError(res, error);
+        throw error;
+    }
+});
+
 module.exports = {
     requiereCliente, requiereAdmin,
-    crearPedido, listarPedidos, obtenerPedido, cancelarPedido, avanzarEstadoHttp,
-    avanzarEstado, ErrorNegocio, numeroPedido, DOMICILIO
+    crearPedido, listarPedidos, obtenerPedido, cancelarPedido, avanzarEstadoHttp, asignarDomiciliarioHttp,
+    avanzarEstado, ErrorNegocio, numeroPedido, DOMICILIO, serializarPedido: aPedido, itemsDe, MSJ_NO_ENCONTRADO
 };

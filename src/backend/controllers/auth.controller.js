@@ -28,7 +28,7 @@ const login = asincrono(async (req, res) => {
 
         // 2) ¿Es cliente?
         const cliente = (await query(
-            'SELECT id, nombre, correo, telefono, documento, direccion, ciudad, password_hash FROM clientes WHERE LOWER(correo) = $1',
+            'SELECT id, nombre, correo, telefono, documento, direccion, ciudad, foto, password_hash FROM clientes WHERE LOWER(correo) = $1',
             [correo]
         )).rows[0];
         if (cliente && (await passwords.verificar(password, cliente.password_hash))) {
@@ -38,6 +38,21 @@ const login = asincrono(async (req, res) => {
                 mensaje: 'Inicio de sesión exitoso',
                 token: 'mock-token-cliente-' + cliente.id,
                 usuario: { ...datos, rol: 'cliente' }
+            });
+        }
+
+        // 3) ¿Es domiciliario?
+        const domiciliario = (await query(
+            'SELECT id, nombre, correo, telefono, vehiculo, foto, password_hash FROM domiciliarios WHERE LOWER(correo) = $1',
+            [correo]
+        )).rows[0];
+        if (domiciliario && (await passwords.verificar(password, domiciliario.password_hash))) {
+            const { password_hash, ...datos } = domiciliario;
+            return res.json({
+                success: true,
+                mensaje: 'Inicio de sesión exitoso',
+                token: 'mock-token-domiciliario-' + domiciliario.id,
+                usuario: { ...datos, rol: 'domiciliario' }
             });
         }
     }

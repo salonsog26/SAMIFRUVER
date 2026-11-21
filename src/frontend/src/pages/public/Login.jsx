@@ -53,7 +53,10 @@ function Login() {
         if (resultado.ok) {
             // replace: true evita que el Login quede en el historial del navegador,
             // así el botón "atrás" ya no puede volver a esta pantalla tras iniciar sesión.
-            navigate(resultado.usuario.rol === 'admin' ? '/admin/productos' : '/', { replace: true });
+            const destino = resultado.usuario.rol === 'admin' ? '/admin/productos'
+                : resultado.usuario.rol === 'domiciliario' ? '/domiciliario/pedidos'
+                : '/';
+            navigate(destino, { replace: true });
             return;
         }
         if (resultado.red) {

@@ -51,9 +51,9 @@ function Navbar({ cartCount }) {
                 )}
                 {sesion && (
                     <Link
-                        to={sesion.rol === 'admin' ? '/admin/productos' : '/perfil'}
+                        to={sesion.rol === 'admin' ? '/admin/productos' : sesion.rol === 'domiciliario' ? '/domiciliario/pedidos' : '/perfil'}
                         className="public-navbar-user"
-                        aria-label={sesion.rol === 'admin' ? 'Ir al panel de administrador' : 'Ir a mi perfil'}
+                        aria-label={sesion.rol === 'admin' ? 'Ir al panel de administrador' : sesion.rol === 'domiciliario' ? 'Ir al portal del domiciliario' : 'Ir a mi perfil'}
                     >
                         <span className="public-navbar-user-name">{(sesion.nombre || 'Usuario').split(' ')[0]}</span>
                         <span className="public-navbar-avatar">{iniciales(sesion.nombre || sesion.correo)}</span>

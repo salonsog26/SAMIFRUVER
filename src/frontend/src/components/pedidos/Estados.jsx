@@ -1,6 +1,6 @@
 // src/components/pedidos/Estados.jsx — piezas visuales compartidas por las pantallas de pedidos (Épica 3)
 import React from 'react';
-import { Check, CircleAlert, Info, X, ShoppingBasket } from 'lucide-react';
+import { Check, CircleAlert, Info, TriangleAlert, X, ShoppingBasket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ETAPAS, etiquetaEstado, tonoEstado, hora, formatoCOP } from '../../utils/pedidos';
 import { resolverImagen, alFallarImagen } from '../../utils/imagenes';
@@ -16,9 +16,9 @@ export function InsigniaEstado({ estado }) {
     );
 }
 
-// Franja de aviso a todo el ancho. tipo: 'info' | 'exito' | 'error'. Con onCerrar muestra la X.
+// Franja de aviso a todo el ancho. tipo: 'info' | 'exito' | 'error' | 'warning'. Con onCerrar muestra la X.
 export function Franja({ tipo = 'info', children, onCerrar, className = '' }) {
-    const Icono = tipo === 'error' ? CircleAlert : tipo === 'exito' ? Check : Info;
+    const Icono = tipo === 'error' ? CircleAlert : tipo === 'exito' ? Check : tipo === 'warning' ? TriangleAlert : Info;
     return (
         <div className={`ped-franja ped-franja-${tipo} ${className}`.trim()} role={tipo === 'error' ? 'alert' : 'status'}>
             <Icono size={20} aria-hidden="true" />

@@ -34,6 +34,7 @@
 .ped-franja-info { background: #E8F5EC; border-color: #BFE3C9; color: #14532D; }
 .ped-franja-exito { background: #E8F5E9; border-color: #20A34A; color: #14532D; }
 .ped-franja-error { background: #FDECEC; border-color: #F2B8B8; color: #C62828; }
+.ped-franja-warning { background: #FFF4D6; border-color: #F3DC8A; color: #8A5A00; }
 .ped-franja-cerrar { background: none; border: 0; cursor: pointer; color: inherit; display: inline-flex; padding: 4px; }
 .ped-nota { font-size: 13px; color: #68786F; margin: 4px 0 0; }
 .ped-nota-info { background: #F1F5F2; border-radius: 10px; padding: 8px 12px; }

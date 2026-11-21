@@ -9,8 +9,8 @@ const { getPool, cerrar } = require('../lib/db');
 const CARPETA = path.join(__dirname, '../../../database');
 
 (async () => {
-    const archivos = ['01_schema.sql'];
-    if (!process.argv.includes('--sin-datos')) archivos.push('02_seed.sql');
+        const archivos = ['01_schema.sql', '03_domicilios.sql', '04_migracion_pedidos.sql'];
+        if (!process.argv.includes('--sin-datos')) archivos.push('02_seed.sql');
     try {
         for (const nombre of archivos) {
             const sql = fs.readFileSync(path.join(CARPETA, nombre), 'utf-8');

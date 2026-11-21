@@ -30,11 +30,26 @@ CREATE TABLE IF NOT EXISTS clientes (
     documento       VARCHAR(30)  NOT NULL DEFAULT '',
     direccion       VARCHAR(120) NOT NULL DEFAULT '',
     ciudad          VARCHAR(60)  NOT NULL DEFAULT '',
+    foto            TEXT         NOT NULL DEFAULT '',
     creado_en       TIMESTAMPTZ  NOT NULL DEFAULT now(),
     actualizado_en  TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 -- El correo no distingue mayúsculas: ANA@x.com y ana@x.com son el mismo cliente ("El usuario ya existe").
 CREATE UNIQUE INDEX IF NOT EXISTS ux_clientes_correo ON clientes (LOWER(correo));
+
+-- Domiciliarios (Épica 5). Misma idea que clientes: cuenta propia, contraseña cifrada.
+-- El domiciliario solo ve los pedidos cuyo domiciliario_id es el suyo.
+CREATE TABLE IF NOT EXISTS domiciliarios (
+    id              SERIAL PRIMARY KEY,
+    nombre          VARCHAR(60)  NOT NULL,
+    correo          VARCHAR(120) NOT NULL,
+    telefono        VARCHAR(30)  NOT NULL,
+    vehiculo        VARCHAR(40)  NOT NULL DEFAULT 'Moto',
+    foto            TEXT         NOT NULL DEFAULT '',
+    password_hash   TEXT         NOT NULL,
+    creado_en       TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_domiciliarios_correo ON domiciliarios (LOWER(correo));
 
 -- Productos del catálogo (Épica 1: HU1 registrar, HU2 actualizar, HU3 consultar).
 CREATE TABLE IF NOT EXISTS productos (
@@ -69,13 +84,19 @@ CREATE TABLE IF NOT EXISTS pedidos (
     subtotal             NUMERIC(12,2)  NOT NULL CHECK (subtotal >= 0),
     domicilio            NUMERIC(12,2)  NOT NULL DEFAULT 0 CHECK (domicilio >= 0),
     total                NUMERIC(12,2)  NOT NULL CHECK (total >= 0),
-    metodo_pago          VARCHAR(15)    NOT NULL CHECK (metodo_pago IN ('tarjeta', 'mercadopago')),
+    metodo_pago          VARCHAR(15)    NOT NULL CHECK (metodo_pago IN ('tarjeta', 'mercadopago', 'efectivo')),
     pago_detalle         VARCHAR(60)    NOT NULL DEFAULT '',
+    -- aprobado: tarjeta o Mercado Pago al crear el pedido. pendiente/recibido: efectivo, se cobra al entregar.
+    pago_estado          VARCHAR(15)    NOT NULL DEFAULT 'aprobado'
+                         CHECK (pago_estado IN ('aprobado', 'pendiente', 'recibido')),
     dir_alias            VARCHAR(40)    NOT NULL DEFAULT 'Casa',
     dir_nombre           VARCHAR(80)    NOT NULL DEFAULT '',
     dir_linea            VARCHAR(160)   NOT NULL,
     dir_ciudad           VARCHAR(60)    NOT NULL,
     dir_telefono         VARCHAR(30)    NOT NULL DEFAULT '',
+    dir_indicaciones     VARCHAR(200)   NOT NULL DEFAULT '',
+    domiciliario_id      INTEGER        REFERENCES domiciliarios (id),
+    entrega_estimada     TIMESTAMPTZ,
     repartidor_nombre    VARCHAR(80),
     repartidor_vehiculo  VARCHAR(40),
     repartidor_telefono  VARCHAR(30),
@@ -87,6 +108,8 @@ CREATE TABLE IF NOT EXISTS pedidos (
     cancelado_en         TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS ix_pedidos_cliente ON pedidos (cliente_id, creado_en);
+-- ix_pedidos_domiciliario se crea en 03_domicilios.sql: en bases antiguas la columna
+-- domiciliario_id todavía no existe cuando corre este archivo.
 
 -- Productos de cada pedido. Se copian nombre, imagen y precio del momento de la compra, así el historial
 -- no cambia si luego se edita o se elimina el producto (en ese caso producto_id queda en NULL).

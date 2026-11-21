@@ -64,6 +64,15 @@ function ResumenCompra({ pedido, children }) {
     );
 }
 
+function textoPago(pedido) {
+    if (pedido.pagoEstado === 'pendiente' || pedido.metodoPago === 'efectivo' && pedido.pagoEstado !== 'recibido') {
+        return 'Pago en efectivo pendiente';
+    }
+    if (pedido.metodoPago === 'efectivo') return 'Pagado en efectivo';
+    if (pedido.metodoPago === 'tarjeta') return `Pagado con ${pedido.pagoDetalle}`;
+    return 'Pagado con Mercado Pago';
+}
+
 function DetallesEntrega({ pedido }) {
     const d = pedido.direccion;
     return (
@@ -77,7 +86,7 @@ function DetallesEntrega({ pedido }) {
                     <span>{d.ciudad}{d.telefono ? ` · ${d.telefono}` : ''}</span>
                 </div>
             </div>
-            <p className="ped-entrega-pago">{pedido.metodoPago === 'tarjeta' ? `Pagado con ${pedido.pagoDetalle}` : 'Pagado con Mercado Pago'}</p>
+            <p className="ped-entrega-pago">{textoPago(pedido)}</p>
         </section>
     );
 }
@@ -181,7 +190,11 @@ function SeguimientoPedido() {
 
     // ---------------------------------------------------------- pedido cancelado (detalle)
     if (estado === 'cancelado') {
-        const medio = pedido.metodoPago === 'tarjeta' ? `a tu tarjeta ${pedido.pagoDetalle}` : 'a tu cuenta de Mercado Pago';
+        const medio = pedido.metodoPago === 'tarjeta'
+            ? `a tu tarjeta ${pedido.pagoDetalle}`
+            : pedido.metodoPago === 'efectivo'
+                ? 'del pago en efectivo'
+                : 'a tu cuenta de Mercado Pago';
         return (
             <div className="public-page ped-pagina">
                 <Navbar />

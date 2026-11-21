@@ -2,12 +2,13 @@
 const express = require('express');
 const {
     requiereCliente, requiereAdmin,
-    crearPedido, listarPedidos, obtenerPedido, cancelarPedido, avanzarEstadoHttp
+    crearPedido, listarPedidos, obtenerPedido, cancelarPedido, avanzarEstadoHttp, asignarDomiciliarioHttp
 } = require('../controllers/pedidos.controller');
 const router = express.Router();
 
-// Avanzar estado: solo con la clave de administrador (no usa la sesión del cliente).
+// Avanzar estado y asignar domiciliario: solo con la clave de administrador (no usa la sesión del cliente).
 router.patch('/:id/estado', requiereAdmin, avanzarEstadoHttp);
+router.post('/:id/asignar', requiereAdmin, asignarDomiciliarioHttp);
 
 // El resto exige un cliente identificado (cabecera X-Cliente-Id).
 router.use(requiereCliente);
